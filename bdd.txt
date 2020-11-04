@@ -1,0 +1,3 @@
+0,portefeuille,,,7
+1,téléphone,,,(en fonction de si on peut voir les apparts ou pas)
+2,la poste,,,9
