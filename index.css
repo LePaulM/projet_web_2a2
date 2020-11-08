@@ -31,8 +31,6 @@ body {
     border-radius: 10px;
     background-color: #DEDEDE;
     opacity : 0.8;
-    justify-content : flex-end;
-    align-items:flex-end;
     border :solid;
 }
 #coordinates {
@@ -68,6 +66,18 @@ body {
     /* background-color: blue; */
 }
 
+#basemaps-wrapper {
+    display: flex;
+    justify-content : center;
+    top: 10px;
+    right: 10px;
+    box-shadow: none;
+
+}
+#basemaps {
+    margin-bottom: 5px;
+}
+
 button {
     width : 200px;
     border : solid;
@@ -76,4 +86,22 @@ button {
     background-color:#06389B;
     border-color: #1A1D22;
     color : wheat;
+}
+
+#info_speech {
+    width : 350px;
+    border-radius: 10px;
+    background-color: #DEDEDE;
+    opacity : 0.8;
+    border :solid;
+    margin: 10px;
+
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+}
+
+option{
+    border: solid;
+    width: 100%;
 }
