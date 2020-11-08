@@ -150,7 +150,7 @@ function initiate_map() {
 
 // Get and returns value of current iss location
 function getValue() {
-    console.log(Lat);
+    //console.log("Latitude : "+Lat);
     if (Lat !== null) {
         //console.log(Lat);
         var oldLat = Lat;
@@ -180,10 +180,61 @@ function getValue() {
     return Lat,Long
 }
 
+// Get and returns value of current iss location
+function get_image() {
+    console.log(Lat);
+    var img;
+    $.ajax({
+        type: 'GET',
+        dataType: 'jsonp',
+        url: "https://api.mapbox.com/styles/v1/mapbox/light-v10/static/"+Lat+","+Long+","+current_zoom+"/"+img_size+"?access_token=pk.eyJ1IjoiaWFtdmRvIiwiYSI6IkI1NGhfYXMifQ.2FD2Px_Fh2gAZCFTxdrL7g",
+        // https://api.mapbox.com/styles/v1/{username}/{style_id}/static/{overlay}/{lon},{lat},{zoom},{bearing},{pitch}|{auto}/{width}x{height}{@2x}
+        async: false,
+        crossDomain: true,
+        complete: function (data) {
+            if (data.readyState === 4 && data.status === 200) {
+                img = parseFloat(data.responseJSON);
+                console.log("img = " + img);
+                
+            }
+        }
+    });
+
+    return img
+}
+
+// Get and returns value of current iss location
+function get_text() {
+    console.log(Lat);
+
+    $.ajax({
+        type: 'REST',
+        dataType: 'jsonp',
+        url: "api.geonames.org/findNearbyPlaceName?",
+        async: false,
+        crossDomain: true,
+        complete: function (data) {
+            if (data.readyState === 4 && data.status === 200) {
+                name = parseFloat(data.responseJSON.geonames.name);
+                population = parseFloat(data.responseJSON.geonames.population);
+                countryName = parseFloat(data.responseJSON.geonames.countryName);
+                fclName = parseFloat(data.responseJSON.geonames.fclName);
+
+                //console.log(Lat,Long);
+            }
+        }
+    });
+
+    console.log(name,population,countryName,fclName);
+    
+}
+
 function gui() {
     // •Empêchez le comportement par défaut (envoi des données au serveur)
     if (photo == false) {
         //console.log(oldLatlng);
+
+        // regarder promises pour faire attendre la réponse au reste de la fonction
         getValue();
         var latlng = L.latLng(Lat,Long);
         //console.log(latlng);
@@ -258,28 +309,58 @@ Générez donc la bonne URL
 Utilisez cette URL comme src d’une image HTML ou en image d’arrière-plan CSS 
 Cette API a toutefois besoin d’une clé, il faut donc s’inscrire (gratuit) sur le site. 
 Ou utilisez celle de Vincent pk.eyJ1IjoiaWFtdmRvIiwiYSI6IkI1NGhfYXMifQ.2FD2Px_Fh2gAZCFTxdrL7g
-•Création du texte: pour cela, nous allons encore une fois utiliser un service, celui de geonames nommé findNearbyPlaceNameJSON, ici: http://www.geonames.org/export/web-services.html#findNearbyPlaceName 
 */
-var r= $('<button onclick="photo_false()" style="width : 200px;border : solid;padding : 10px;border-radius: 10px;background-color:#06389B;border-color: #1A1D22;color : wheat;">Fermer</Button>');
 function form_validation(event) {
+    $('#info_speech').empty();
+
+    append_text()
+
+    append_options();
+
+    $("#info_speech").show();
+
     // •Empêchez le comportement par défaut (envoi des données au serveur)
     event.preventDefault();
     photo = true;
     console.log("photo = " + photo);
     img_size = "500x400";
-    img = $("<img src=https://api.mapbox.com/styles/v1/mapbox/light-v10/static/"+Lat+","+Long+","+current_zoom+"/"+img_size+"?access_token=pk.eyJ1IjoibGVwb2xsdXgiLCJhIjoiY2s5ZTR1bnVkMDF0bzNsbXczdDNhdnJ6YyJ9.GFqQztJamr3JyKGlaWt6dA alt='Map of the Edmund Pettus Bridge in Selma, Alabama.'></img>");
-    $("result").append(img);
+    img_src = get_image();
+    console.log("img_src = " + img_src);
+    img = $("<img src="+img_src+" alt='Map of the Edmund Pettus Bridge in Selma, Alabama.'></img>");
+    $("#info_speech").append(img);
     
-    $("form").append(r);
+
+
 }
 
+function append_image() {
+
+}
+
+// •Création du texte: pour cela, nous allons encore une fois utiliser un service, celui de geonames nommé findNearbyPlaceNameJSON, ici: http://www.geonames.org/export/web-services.html#findNearbyPlaceName 
+
+function append_text() {
+    //get_text();
+    var paragraph = "<p>Coordonnées :<br>Lat : " + Lat + ", Long : " + Long+"</p>";
+    $("#info_speech").append(paragraph);
+}
+
+function append_options() {
+    var r= $('<button onclick="photo_false()" style="width : 200px;border : solid;padding : 10px;border-radius: 10px;background-color:#06389B;border-color: #1A1D22;color : wheat;">Fermer</Button>');
+
+    $("#info_speech").append(r);
+}
+
+
+
+
+// bouton pour fermet la 
 function photo_false() {
     photo = false;
     console.log("photo = " + photo);
-    r.remove();
+    $("#info_speech").hide();
+
 }
-
-
 
 // Une ligne entre le point précédent et le nouveau point doit se créer afin de voir le déplacement de l’ISS
 function drawline(latlng) {
@@ -302,9 +383,12 @@ function addmarker(latlng) {
 
 // Ajoutez également quelque part la la.tude/longitude en mode texte
 function showLatLng() {
-    
     var paragraph = document.getElementById("coordinates");
     paragraph.innerHTML = "<p>Coordonnées :<br>Lat : " + Lat + ", Long : " + Long+"</p>";
+
+/*     $("#coordinates").empty();
+    var paragraph = "<p>Coordonnées :<br>Lat : " + Lat + ", Long : " + Long+"</p>";
+    $("#coordinates").append(paragraph); */
 
 
     /* var paragraph = document.getElementById("coordinates");
