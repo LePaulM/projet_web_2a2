@@ -1,10 +1,18 @@
 /**
  * IDEES
  * 
+ * séparer fichiers : map.js, iss_movement (pas vraiment ça mais t'as l'idée), init.js?, etc
+ * 
+ * promises pour attendre le résultat de la requête avant de faire le reste
+ * 
  * Laisser le premier marker
  * juste cacher les marker précédents et les afficher quand on passe la souris sur la position
  * 
  * afficher l'heure également, genre pour montrer la vitesse
+ * 
+ * drawline et tout se font toujours
+ * juste le setview qui bouge pas
+ * checkbox.setclickable(false)
  * 
  * */
 
@@ -328,8 +336,6 @@ function form_validation(event) {
     console.log("img_src = " + img_src);
     img = $("<img src="+img_src+" alt='Map of the Edmund Pettus Bridge in Selma, Alabama.'></img>");
     $("#info_speech").append(img);
-    
-
 
 }
 
