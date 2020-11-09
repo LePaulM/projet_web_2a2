@@ -16,7 +16,10 @@
         <!-- Map -->
         <div id='map'></div>
 
-
+        <div id='info_speech'> 
+            <h1 id='speech_title'>Bienvenue sur le site "Tweet comme Thomas Pesquet !".</h1><p id='speech_p'>Veuillez patienter pendant que nous récupérons la position de la Station Spatiale Internationale.</p>
+            <button id="close_info_speech_button" onclick="close_info_speech()" >Fermer</button>
+        </div>
         
         
         <form name='form' id='form'>
@@ -55,16 +58,13 @@
             </div>
             <!-- valide comme Pesquet ! -->
 
-            <div id='submit'>
-                <button id="submit_button" onclick="form_validation(event)">Tweet comme Pesquet !</button>
+            <div id='validate'>
+                <button id="validate_button" onclick="form_validation(event)">Tweet comme Pesquet !</button>
                 <!-- <label for='submit'></label><input  type="submit" name="submit"  value="Tweet comme Pesquet !"> -->
             </div>
         </form>
 
-        <div id='info_speech'> 
-            <h1 id='speech_title'>Bienvenue sur le site "Tweet comme Thomas Pesquet !".</h1><p id='speech_p'>Veuillez patienter pendant que nous récupérons la position de la Station Spatiale Internationale.</p>
-            <button id="close_info_speech_button" onclick="close_info_speech()" >Fermer</button>
-        </div>
+
 
         <div></div>
     </div>

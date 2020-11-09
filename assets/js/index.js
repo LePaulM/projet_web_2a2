@@ -35,7 +35,7 @@ function init() {
     var height = window.innerHeight;
     var width = window.innerWidth;
     //console.log($('#content').outerHeight());
-    var map_height = height-$('#content').outerHeight()+$('#info_speech').outerHeight()-16;
+    var map_height = height-$('#content').outerHeight()/* +$('#info_speech').outerHeight() */-16;
     $('#map').css('height', map_height);
     
 /*     var info_X = width/2-$('#info_speech').outerWidth()/2;
@@ -49,9 +49,13 @@ function init() {
     $('#info_speech').css('right',info_X); */
     
 
-    initiate_map()
+    init_map()
 
     //$('info_speech').css();
+
+    // Mettre le truc de rafraichissement de la fonction ici comme ça ça se lance direct
+    // et lancer une première fois, ça marcherait
+
 
     while (Lat === null) {
         if (Lat === null) {
@@ -80,7 +84,7 @@ window.onload = init();
 // create and initiate map
 var map;
 
-function initiate_map() {
+function init_map() {
      map = L.map('map').setView([43, 4], current_zoom);
 
     // La clef d'api mapbox sert à accéder à l'affichage de la carte, ainsi qu'aux calculs d'itinéraires
@@ -96,67 +100,8 @@ function initiate_map() {
     });
     
     mapbox_tilelayer.addTo(map);
-    
-    
-    /*
-    var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-        minZoom: 7,
-        maxZoom: 19,
-    });
-    
-     Esri_WorldImagery.addTo(map); */
-
-
-/*     map = L.map('map').setView([-33.87, 150.77], current_zoom);
-    var layer = L.esri.basemapLayer('Imagery').addTo(map);
-    var layerLabels;
-  
-    function setBasemap (basemap) {
-      if (layer) {
-        map.removeLayer(layer);
-      }
-  
-      layer = L.esri.basemapLayer(basemap);
-  
-      map.addLayer(layer);
-  
-      if (layerLabels) {
-        map.removeLayer(layerLabels);
-      }
-  
-      if (
-        basemap === 'ShadedRelief' ||
-        basemap === 'Oceans' ||
-        basemap === 'Gray' ||
-        basemap === 'DarkGray' ||
-        basemap === 'Terrain'
-      ) {
-        $('#teleobjectif_label').hide();
-        if (current_zoom === 7) {
-            $('#teleobjectif_radio_reflex').click();
-            //map.setZoom(10);
-        }
-        
-        Esri_WorldImagery.removeFrom(map);
-
-        layerLabels = L.esri.basemapLayer(basemap + 'Labels');
-        map.addLayer(layerLabels);
-      } else if (basemap.includes('Imagery')) {
-        $('#teleobjectif_label').show();
-        Esri_WorldImagery.addTo(map);
-      } else {
-        $('#teleobjectif_label').show();
-      }
-    }
-    document
-      .querySelector('#basemaps')
-      .addEventListener('change', function (e) {
-        var basemap = e.target.value;
-        setBasemap(basemap);
-      }); */
  
-      layerGroup.addTo(map);
+    layerGroup.addTo(map);
 }
 
 // Get and returns value of current iss location
@@ -182,7 +127,7 @@ function getValue() {
                 Lat = parseFloat(data.responseJSON.iss_position.latitude);
                 Long = parseFloat(data.responseJSON.iss_position.longitude);
 
-                //console.log(Lat,Long);
+                console.log("Lat : "+Lat+", Long : "+Long);
             }
         }
     });
@@ -192,13 +137,13 @@ function getValue() {
 }
 
 // Get and returns value of current iss location
-function get_image() {
+function get_image(url) {
     console.log(Lat);
     var img;
     $.ajax({
         type: 'GET',
         dataType: 'jsonp',
-        url: "https://api.mapbox.com/styles/v1/mapbox/light-v10/static/"+Lat+","+Long+","+current_zoom+"/"+img_size+"?access_token=pk.eyJ1IjoiaWFtdmRvIiwiYSI6IkI1NGhfYXMifQ.2FD2Px_Fh2gAZCFTxdrL7g",
+        url: url,
         // https://api.mapbox.com/styles/v1/{username}/{style_id}/static/{overlay}/{lon},{lat},{zoom},{bearing},{pitch}|{auto}/{width}x{height}{@2x}
         async: false,
         crossDomain: true,
@@ -334,41 +279,69 @@ Ou utilisez celle de Vincent pk.eyJ1IjoiaWFtdmRvIiwiYSI6IkI1NGhfYXMifQ.2FD2Px_Fh
 */
 function form_validation(event) {
 
-    console.log("Lat : "+Lat);
-    $('#info_speech').empty();
-
-    append_text();
-
-    append_image();
-
-    append_options();
-
-    $("#info_speech").show();
-
     // •Empêchez le comportement par défaut (envoi des données au serveur)
     event.preventDefault();
     photo = true;
     console.log("photo = " + photo);
 
+    
+    $('#info_speech').empty();
+
+    append_text();
+
+    var img_size = "450x300";
+    //var mapbox_image_basemap = "mapbox/satellite-v9"
+    console.log("oldLat : "+ oldLatlng.lat +"oldLng : "+ oldLatlng.lng);
+    console.log("current_zoom : "+current_zoom);
+    console.log("img_size : " + img_size);
+    var mapbox_key = "pk.eyJ1Ijoic21lcm1ldCIsImEiOiJjaXRwamcwc3UwMDBiMm5xb21yMWdra25yIn0.vF2GPPTa0bDqjJmJZpIl7g"; //celle de vincent
+    var img = append_image("https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/"+ oldLatlng.lng +","+ oldLatlng.lat +","+current_zoom+"/"+img_size+"?access_token="+mapbox_key);
+    $("#info_speech").append(img);
+
+    var options = append_options();
+    $("#info_speech").append(options);
+
+    $("#info_speech").css('opacity',1);
+    $("#info_speech").show();
+
+    //ajouter un marker à l'endroit de la photo
+
+
     // on desactive les boutons pour valider le formulaire et le verouillage de la vue
-    $('#submit_button').prop("disabled", true);
+    $('#validate_button').prop("disabled", true);
     $('#checkbox_input').attr("checked", false);
     $('#checkbox_input').prop("disabled", true);
     
 }
 
-function append_image() {
-    img_size = "500x400";
-    img_src = '<img id="img_toname" src="https://api.mapbox.com/styles/v1/mapbox/light-v10/static/-87.0186,32.4055,14/500x400?access_token=pk.eyJ1IjoibGVwb2xsdXgiLCJhIjoiY2s5ZTR1bnVkMDF0bzNsbXczdDNhdnJ6YyJ9.GFqQztJamr3JyKGlaWt6dA" alt="Map of the Edmund Pettus Bridge in Selma, Alabama.">'; // ça ça marche 
+const fonction_promise = (requete) => {
+	
+	const promise = get_image(requete).then(append_image(resultat)).catch((error) => console.log(error))
+	
+	return promise
+ 
+}
+
+function append_image(img_src) {
+    
+    img = '<img id="img_toname" src='+img_src+' alt="Map of the Edmund Pettus Bridge in Selma, Alabama." style="justify-self : center">'; // ça ça marche 
     //img_src = '<img src="https://api.mapbox.com/styles/v1/mapbox/mapbox/light-v10/static/'+Lat+','+Long+','+current_zoom+'/'+img_size+'?access_token=pk.eyJ1IjoibGVwb2xsdXgiLCJhIjoiY2s5ZTR1bnVkMDF0bzNsbXczdDNhdnJ6YyJ9.GFqQztJamr3JyKGlaWt6dA" alt="Map of the Edmund Pettus Bridge in Selma, Alabama.">'; //ça ça marche pas
     console.log("img_src = " + img_src);
-    $("#info_speech").append(img_src);
-
-/*     img_size = "500x400";
-    img_src = get_image();
+/* 
+    img_size = "500x400";
+    img_src = fonction_promise("https://api.mapbox.com/styles/v1/mapbox/light-v10/static/"+Lat+","+Long+","+current_zoom+"/"+img_size+"?access_token=pk.eyJ1IjoiaWFtdmRvIiwiYSI6IkI1NGhfYXMifQ.2FD2Px_Fh2gAZCFTxdrL7g");
     console.log("img_src = " + img_src);
     img = $("<img src="+img_src+" alt='Map of the Edmund Pettus Bridge in Selma, Alabama.'></img>");
     $("#info_speech").append(img); */
+
+    /* console.log("img_src = " + img_src);
+    img = $("<img src="+img_src+" alt='Map of the Edmund Pettus Bridge in Selma, Alabama.'></img>"); */
+    
+
+    return img
+
+    //retourner un element DOM à intégrer au HTML
+
 }
 
 // •Création du texte: pour cela, nous allons encore une fois utiliser un service, celui de geonames nommé findNearbyPlaceNameJSON, ici: http://www.geonames.org/export/web-services.html#findNearbyPlaceName 
@@ -380,9 +353,9 @@ function append_text() {
 }
 
 function append_options() {
-    var r= $('<button id="button_toname" onclick="photo_false()">Fermer</Button>');
+    var options= $('<button id="close" onclick="photo_false()">Fermer</button><button id="tweet" onclick="photo_false()">Tweeter !</button>');
 
-    $("#info_speech").append(r);
+    return options;
 }
 
 
@@ -395,7 +368,7 @@ function photo_false() {
     // on cache la boite de dialogue
     $("#info_speech").hide();
     // on réactive les boutons pour valider le formulaire et le verouillage de la vue
-    $('#submit_button').prop("disabled", false);
+    $('#validate_button').prop("disabled", false);
     $('#checkbox_input').attr("checked", true);
     $('#checkbox_input').prop("disabled", false);
 }
@@ -437,3 +410,68 @@ function showLatLng() {
 function close_info_speech() {
     $('#info_speech').hide();
 }
+
+
+
+/**
+ * Dans map_init()
+ * 
+ */
+
+    /*
+    var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        minZoom: 7,
+        maxZoom: 19,
+    });
+    
+     Esri_WorldImagery.addTo(map); */
+
+
+/*     map = L.map('map').setView([-33.87, 150.77], current_zoom);
+    var layer = L.esri.basemapLayer('Imagery').addTo(map);
+    var layerLabels;
+  
+    function setBasemap (basemap) {
+      if (layer) {
+        map.removeLayer(layer);
+      }
+  
+      layer = L.esri.basemapLayer(basemap);
+  
+      map.addLayer(layer);
+  
+      if (layerLabels) {
+        map.removeLayer(layerLabels);
+      }
+  
+      if (
+        basemap === 'ShadedRelief' ||
+        basemap === 'Oceans' ||
+        basemap === 'Gray' ||
+        basemap === 'DarkGray' ||
+        basemap === 'Terrain'
+      ) {
+        $('#teleobjectif_label').hide();
+        if (current_zoom === 7) {
+            $('#teleobjectif_radio_reflex').click();
+            //map.setZoom(10);
+        }
+        
+        Esri_WorldImagery.removeFrom(map);
+
+        layerLabels = L.esri.basemapLayer(basemap + 'Labels');
+        map.addLayer(layerLabels);
+      } else if (basemap.includes('Imagery')) {
+        $('#teleobjectif_label').show();
+        Esri_WorldImagery.addTo(map);
+      } else {
+        $('#teleobjectif_label').show();
+      }
+    }
+    document
+      .querySelector('#basemaps')
+      .addEventListener('change', function (e) {
+        var basemap = e.target.value;
+        setBasemap(basemap);
+      }); */
