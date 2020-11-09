@@ -26,7 +26,7 @@ var layerGroup = L.layerGroup();
 
 var photo = false;
 
-var current_zoom = 7;
+var current_zoom = 10;
 
 // Init function
 function init() {
@@ -34,7 +34,7 @@ function init() {
     // adapte la taille de la carte à la taille de l'écran
     var height = window.innerHeight;
     var width = window.innerWidth;
-    console.log($('#content').outerHeight());
+    //console.log($('#content').outerHeight());
     var map_height = height-$('#content').outerHeight()+$('#info_speech').outerHeight()-16;
     $('#map').css('height', map_height);
     
@@ -60,7 +60,7 @@ function init() {
             console.log(Lat);
             var latlng = L.latLng(Lat,Long);
             console.log(latlng);
-            map.setView(latlng);
+            map.setView(latlng,current_zoom);
         
             // Ajoutez un marker à la posi.on récupérée (créez une icône personnalisée de votre choix)
             addmarker(latlng)
@@ -81,30 +81,34 @@ window.onload = init();
 var map;
 
 function initiate_map() {
- //    map = L.map('map').setView([43, 4], current_zoom);
+     map = L.map('map').setView([43, 4], current_zoom);
 
-/*     // La clef d'api mapbox sert à accéder à l'affichage de la carte, ainsi qu'aux calculs d'itinéraires
+    // La clef d'api mapbox sert à accéder à l'affichage de la carte, ainsi qu'aux calculs d'itinéraires
     var mapboxToken = 'pk.eyJ1Ijoic21lcm1ldCIsImEiOiJjaXRwamcwc3UwMDBiMm5xb21yMWdra25yIn0.vF2GPPTa0bDqjJmJZpIl7g'
     // Génération du fond de carte mapbox via leaflet
-    var mapbos_tilelayer = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    var mapbox_tilelayer = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        minZoom: 7,
+        minZoom: 2,
         id: 'mapbox/satellite-v9',
-        maxZoom: 19,
+        maxZoom: 13,
          zoom: 10,
         accessToken: mapboxToken
-    }) */
+    });
     
+    mapbox_tilelayer.addTo(map);
+    
+    
+    /*
     var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
         minZoom: 7,
         maxZoom: 19,
     });
     
-/*     Esri_WorldImagery.addTo(map); */
+     Esri_WorldImagery.addTo(map); */
 
 
-    map = L.map('map').setView([-33.87, 150.77], 10);
+/*     map = L.map('map').setView([-33.87, 150.77], current_zoom);
     var layer = L.esri.basemapLayer('Imagery').addTo(map);
     var layerLabels;
   
@@ -134,8 +138,8 @@ function initiate_map() {
             //map.setZoom(10);
         }
         
-        
         Esri_WorldImagery.removeFrom(map);
+
         layerLabels = L.esri.basemapLayer(basemap + 'Labels');
         map.addLayer(layerLabels);
       } else if (basemap.includes('Imagery')) {
@@ -145,13 +149,12 @@ function initiate_map() {
         $('#teleobjectif_label').show();
       }
     }
-  
     document
       .querySelector('#basemaps')
       .addEventListener('change', function (e) {
         var basemap = e.target.value;
         setBasemap(basemap);
-      });
+      }); */
  
       layerGroup.addTo(map);
 }
@@ -237,32 +240,41 @@ function get_text() {
     
 }
 
+
+/**
+ * gui = graphical user interface
+ * 
+ * cette fonction change de la carte en fonction de la valeur récupérée 
+ */
+
 function gui() {
     // •Empêchez le comportement par défaut (envoi des données au serveur)
+
+    // regarder promises pour faire attendre la réponse au reste de la fonction
+    
+    var latlng = L.latLng(Lat,Long);
+    //console.log(latlng);
+
+    // Ajoutez un marker à la position récupérée (créez une icône personnalisée de votre choix)
+    //console.log(layerGroup.hasLayer(marker));
+    if (layerGroup.hasLayer(marker) === true) {
+        layerGroup.removeLayer(marker);
+    }
+    
+    addmarker(latlng)
+
+    // Une ligne entre le point précédent et le nouveau point doit se créer afin de voir le déplacement de l’ISS
+    drawline(latlng);
+
+
     if (photo == false) {
         //console.log(oldLatlng);
 
-        // regarder promises pour faire attendre la réponse au reste de la fonction
-        getValue();
-        var latlng = L.latLng(Lat,Long);
-        //console.log(latlng);
-
-        // Ajoutez un marker à la position récupérée (créez une icône personnalisée de votre choix)
-        //console.log(layerGroup.hasLayer(marker));
-        if (layerGroup.hasLayer(marker) === true) {
-            layerGroup.removeLayer(marker);
-        }
-        
-        addmarker(latlng)
-
-        // Une ligne entre le point précédent et le nouveau point doit se créer afin de voir le déplacement de l’ISS
-        drawline(latlng);
-
-        // Ajoutez également quelque part la la.tude/longitude en mode texte
+        // Ajoutez également quelque part la latitude/longitude en mode texte
         showLatLng();
 
-        /* Ajoutez également un contrôle perme@ant de me@re à jour la posi.on de la carte automa.quement. 
-        Par exemple:ocase cochée, la carte suit la posi.on de l’ISSocase non cochée, le déplacement est libre */
+        /* Ajoutez également un contrôle permettant de mettre à jour la position de la carte automatiquement. 
+        Par exemple: case cochée, la carte suit la positon de l’ISS; case non cochée, le déplacement est libre */
         if (checkbox == true) {
             map.setView(latlng, current_zoom);
         }
@@ -270,12 +282,13 @@ function gui() {
     } else {
         
     }
+
+    getValue();
     
 }
 
-// La posi.on du marker doit être mise à jour, le texte latitude/longitude également
-
-    window.setInterval("gui()","5000");  
+// La position du marker doit être mise à jour, le texte latitude/longitude également
+window.setInterval("gui()","5000");  
 
 //window.setInterval("gui()","10000");  
 
@@ -287,14 +300,15 @@ var checkbox = true;
 function checkbox_click() {
     
     checkbox = !checkbox;
-    console.log(checkbox);
+    console.log("checkbox.value = "+checkbox);
 }
 
 
 
 
-/* Ensuite, créez un formulaire contenant:
-•3 boutons radio correspondants à des niveaux de zoom différentsPar exemple: «smartphone», «réflex» et «téléobjectif», respectivement niveau de zoom 7, 10 et 13
+/** Ensuite, créez un formulaire contenant:
+ * •3 boutons radio correspondants à des niveaux de zoom différents
+ * Par exemple: «smartphone», «réflex» et «téléobjectif», respectivement niveau de zoom 7, 10 et 13
 */
 function change_zoom(new_level) {
     var latlng = L.latLng(Lat,Long);
@@ -319,9 +333,13 @@ Cette API a toutefois besoin d’une clé, il faut donc s’inscrire (gratuit) s
 Ou utilisez celle de Vincent pk.eyJ1IjoiaWFtdmRvIiwiYSI6IkI1NGhfYXMifQ.2FD2Px_Fh2gAZCFTxdrL7g
 */
 function form_validation(event) {
+
+    console.log("Lat : "+Lat);
     $('#info_speech').empty();
 
-    append_text()
+    append_text();
+
+    append_image();
 
     append_options();
 
@@ -331,23 +349,33 @@ function form_validation(event) {
     event.preventDefault();
     photo = true;
     console.log("photo = " + photo);
-    img_size = "500x400";
-    img_src = get_image();
-    console.log("img_src = " + img_src);
-    img = $("<img src="+img_src+" alt='Map of the Edmund Pettus Bridge in Selma, Alabama.'></img>");
-    $("#info_speech").append(img);
 
+    // on desactive les boutons pour valider le formulaire et le verouillage de la vue
+    $('#submit_button').prop("disabled", true);
+    $('#checkbox_input').attr("checked", false);
+    $('#checkbox_input').prop("disabled", true);
+    
 }
 
 function append_image() {
+    img_size = "500x400";
+    img_src = '<img src="https://api.mapbox.com/styles/v1/mapbox/light-v10/static/-87.0186,32.4055,14/500x400?access_token=pk.eyJ1IjoibGVwb2xsdXgiLCJhIjoiY2s5ZTR1bnVkMDF0bzNsbXczdDNhdnJ6YyJ9.GFqQztJamr3JyKGlaWt6dA" alt="Map of the Edmund Pettus Bridge in Selma, Alabama.">'; // ça ça marche 
+    //img_src = '<img src="https://api.mapbox.com/styles/v1/mapbox/mapbox/light-v10/static/'+Lat+','+Long+','+current_zoom+'/'+img_size+'?access_token=pk.eyJ1IjoibGVwb2xsdXgiLCJhIjoiY2s5ZTR1bnVkMDF0bzNsbXczdDNhdnJ6YyJ9.GFqQztJamr3JyKGlaWt6dA" alt="Map of the Edmund Pettus Bridge in Selma, Alabama.">'; //ça ça marche pas
+    console.log("img_src = " + img_src);
+    $("#info_speech").append(img_src);
 
+/*     img_size = "500x400";
+    img_src = get_image();
+    console.log("img_src = " + img_src);
+    img = $("<img src="+img_src+" alt='Map of the Edmund Pettus Bridge in Selma, Alabama.'></img>");
+    $("#info_speech").append(img); */
 }
 
 // •Création du texte: pour cela, nous allons encore une fois utiliser un service, celui de geonames nommé findNearbyPlaceNameJSON, ici: http://www.geonames.org/export/web-services.html#findNearbyPlaceName 
 
 function append_text() {
     //get_text();
-    var paragraph = "<p>Coordonnées :<br>Lat : " + Lat + ", Long : " + Long+"</p>";
+    var paragraph = "<p>Coordonnées :<br>Lat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng +"</p>";
     $("#info_speech").append(paragraph);
 }
 
@@ -364,8 +392,12 @@ function append_options() {
 function photo_false() {
     photo = false;
     console.log("photo = " + photo);
+    // on cache la boite de dialogue
     $("#info_speech").hide();
-
+    // on réactive les boutons pour valider le formulaire et le verouillage de la vue
+    $('#submit_button').prop("disabled", false);
+    $('#checkbox_input').attr("checked", false);
+    $('#checkbox_input').prop("disabled", true);
 }
 
 // Une ligne entre le point précédent et le nouveau point doit se créer afin de voir le déplacement de l’ISS
@@ -374,7 +406,7 @@ function drawline(latlng) {
     if (oldLatlng != null) {
         latlngsArray.push(oldLatlng);
         latlngsArray.push(latlng);
-        var polyline = L.polyline(latlngsArray, {color: 'red'}).addTo(map);
+        var polyline = L.polyline(latlngsArray, {color: '#FFE000'}).addTo(map);
     }
 }
 

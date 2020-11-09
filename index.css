@@ -89,15 +89,18 @@ button {
 }
 
 #info_speech {
-    width : 350px;
+    width : auto;
     border-radius: 10px;
     background-color: #DEDEDE;
     opacity : 0.8;
     border :solid;
     margin: 10px;
+    margin-right: 370px;
+
+    position: center;
 
     bottom: 0;
-    right: 0;
+    left: 0;
     z-index: 1;
 }
 

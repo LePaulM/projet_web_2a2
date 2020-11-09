@@ -17,22 +17,19 @@
         <div id='map'></div>
 
 
-        <div id='info_speech'> 
-            <h1 id='speech_title'>Bienvenue sur le site "Tweet comme Thomas Pesquet !".</h1><p id='speech_p'>Veuillez patienter pendant que nous récupérons la position de la Station Spatiale Internationale.</p>
-            <button id="close_info_speech_button" onclick="close_info_speech()" >Fermer</button>
-        </div>
+        
         
         <form name='form' id='form'>
 
             <!-- Niveau de zoom -->
             <div id='radio'>
                 <label>Vue :</label><br>
-                <label>Smartphone<input type="radio" class='radio' name="form" value="7" onclick="change_zoom(7)" checked></label>
-                <label>Réflex<input type="radio" class='radio' id='teleobjectif_radio_reflex'  name="form" onclick="change_zoom(10)" value="10"></label>
+                <label>Smartphone<input type="radio" class='radio' name="form" value="7" onclick="change_zoom(7)" ></label>
+                <label>Réflex<input type="radio" class='radio' id='teleobjectif_radio_reflex'  name="form" onclick="change_zoom(10)" value="10" checked></label>
                 <label id='teleobjectif_label'>Téléobjectif<input type="radio"  class='radio' name="form" onclick="change_zoom(13)" value="13"></label>
             </div>
 
-            <div id="basemaps-wrapper" class="leaflet-bar">
+<!--             <div id="basemaps-wrapper" class="leaflet-bar">
                 <select id="basemaps">
                     <option value="Imagery">Imagery</option>
                     <option value="Streets">Streets</option>
@@ -46,23 +43,28 @@
                     <option value="ShadedRelief">Shaded Relief</option>
                     <option value="Physical">Physical</option>
                 </select>
-            </div>
+            </div> -->
 
             <!-- div pour afficher les coordonnées de l'ISS -->
             <div id="coordinates">Coordonnées<br></div>
 
             <!-- Checkbox. Si true la carte suit l'ISS -->
             <div id='checkbox'>
-                <input onclick="checkbox_click()" type="checkbox" checked/>
+                <input id='checkbox_input' onclick="checkbox_click()" type="checkbox" checked/>
                 <label>Verrouiller vue</label>
             </div>
             <!-- valide comme Pesquet ! -->
 
             <div id='submit'>
-                <button onclick="form_validation(event)">Tweet comme Pesquet !</button>
+                <button id="submit_button" onclick="form_validation(event)">Tweet comme Pesquet !</button>
                 <!-- <label for='submit'></label><input  type="submit" name="submit"  value="Tweet comme Pesquet !"> -->
             </div>
         </form>
+
+        <div id='info_speech'> 
+            <h1 id='speech_title'>Bienvenue sur le site "Tweet comme Thomas Pesquet !".</h1><p id='speech_p'>Veuillez patienter pendant que nous récupérons la position de la Station Spatiale Internationale.</p>
+            <button id="close_info_speech_button" onclick="close_info_speech()" >Fermer</button>
+        </div>
 
         <div></div>
     </div>
