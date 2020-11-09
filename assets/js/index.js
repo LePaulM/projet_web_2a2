@@ -359,7 +359,7 @@ function form_validation(event) {
 
 function append_image() {
     img_size = "500x400";
-    img_src = '<img src="https://api.mapbox.com/styles/v1/mapbox/light-v10/static/-87.0186,32.4055,14/500x400?access_token=pk.eyJ1IjoibGVwb2xsdXgiLCJhIjoiY2s5ZTR1bnVkMDF0bzNsbXczdDNhdnJ6YyJ9.GFqQztJamr3JyKGlaWt6dA" alt="Map of the Edmund Pettus Bridge in Selma, Alabama.">'; // ça ça marche 
+    img_src = '<img id="img_toname" src="https://api.mapbox.com/styles/v1/mapbox/light-v10/static/-87.0186,32.4055,14/500x400?access_token=pk.eyJ1IjoibGVwb2xsdXgiLCJhIjoiY2s5ZTR1bnVkMDF0bzNsbXczdDNhdnJ6YyJ9.GFqQztJamr3JyKGlaWt6dA" alt="Map of the Edmund Pettus Bridge in Selma, Alabama.">'; // ça ça marche 
     //img_src = '<img src="https://api.mapbox.com/styles/v1/mapbox/mapbox/light-v10/static/'+Lat+','+Long+','+current_zoom+'/'+img_size+'?access_token=pk.eyJ1IjoibGVwb2xsdXgiLCJhIjoiY2s5ZTR1bnVkMDF0bzNsbXczdDNhdnJ6YyJ9.GFqQztJamr3JyKGlaWt6dA" alt="Map of the Edmund Pettus Bridge in Selma, Alabama.">'; //ça ça marche pas
     console.log("img_src = " + img_src);
     $("#info_speech").append(img_src);
@@ -375,12 +375,12 @@ function append_image() {
 
 function append_text() {
     //get_text();
-    var paragraph = "<p>Coordonnées :<br>Lat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng +"</p>";
+    var paragraph = "<p id='p_toname'>Coordonnées :<br>Lat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng +"</p>";
     $("#info_speech").append(paragraph);
 }
 
 function append_options() {
-    var r= $('<button onclick="photo_false()" style="width : 200px;border : solid;padding : 10px;border-radius: 10px;background-color:#06389B;border-color: #1A1D22;color : wheat;">Fermer</Button>');
+    var r= $('<button id="button_toname" onclick="photo_false()">Fermer</Button>');
 
     $("#info_speech").append(r);
 }
@@ -396,8 +396,8 @@ function photo_false() {
     $("#info_speech").hide();
     // on réactive les boutons pour valider le formulaire et le verouillage de la vue
     $('#submit_button').prop("disabled", false);
-    $('#checkbox_input').attr("checked", false);
-    $('#checkbox_input').prop("disabled", true);
+    $('#checkbox_input').attr("checked", true);
+    $('#checkbox_input').prop("disabled", false);
 }
 
 // Une ligne entre le point précédent et le nouveau point doit se créer afin de voir le déplacement de l’ISS
