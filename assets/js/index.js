@@ -65,7 +65,7 @@ function init() {
     //adapter la position de 'info_speech' et 'form' en fonction de l'écran (responsive)
 
     //initialisation de la map
-    init_map()
+    map_init()
 
 
     // Mettre le truc de rafraichissement de la fonction ici comme ça ça se lance direct
@@ -112,7 +112,7 @@ function init() {
 // Map Management
 // create and initiate map mapbox://styles/lepollux/ckhchpfbj0b8u1aps50vdx668
 
-function init_map() {
+function map_init() {
     map = L.map('map').setView([43, 4], current_zoom);
 
     // La clef d'api mapbox sert à accéder à l'affichage de la carte, ainsi qu'aux calculs d'itinéraires
@@ -328,7 +328,7 @@ function form_validation(event) {
                             // Mise à jour du textArea
                             text_area_MAJ_function();
                         
-                            $('#textarea_toname').keyup(function(){
+                            $('#textarea_toname').keydown(function(){
                                 text_area_MAJ_function()
                             })
                         }
@@ -346,7 +346,7 @@ function form_validation(event) {
                     Utilisez cette URL comme src d’une image HTML ou en image d’arrière-plan CSS  
                     https://docs.mapbox.com/playground/static/
                 */
-                var img_size = "450x300";
+                var img_size = "450x300";           //en pixels
                 var mapbox_image_basemap = "satellite-v9"; /* "styles/lepollux/ckhchpfbj0b8u1aps50vdx668" */
                 var bearing = Math.random() * 360;
                 var mapbox_key = "pk.eyJ1Ijoic21lcm1ldCIsImEiOiJjaXRwamcwc3UwMDBiMm5xb21yMWdra25yIn0.vF2GPPTa0bDqjJmJZpIl7g"; //celle de vincent
@@ -374,13 +374,19 @@ function form_validation(event) {
         }
     });
     
-    // on desactive les boutons pour valider le formulaire et le verouillage de la vue
+    // on desactive le verouillage de la vue et le bouton pour valider le formulaire 
     $('#validate_button').prop("disabled", true);
     $('#checkbox_input').attr("checked", false);
     $('#checkbox_input').prop("disabled", true);
     
 }
 
+/**
+ * fonction qui sert à mettre à jour le nombre de caractères restants pour le tweet (144 caractères max)
+ * elle désactive la textarea quand il y a 144 caractères
+ * 
+ * il faudrait trouver un moyen pour que ça empêche juste d'écrire plus
+ */
 function text_area_MAJ_function() {
     var max = 144;
     //console.log($('#textarea_toname'));
