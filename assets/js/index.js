@@ -248,13 +248,13 @@ function form_validation(event) {
     // •Empêchez le comportement par défaut (envoi des données au serveur)
     event.preventDefault();
     photo = true;
-    console.log("photo = " + photo);
+    //console.log("photo = " + photo);
 
     
     inf_speech_dialog.empty();
 
     var text_url = "http://api.geonames.org/findNearbyPlaceNameJSON?lat="+oldLatlng.lat+"&lng="+oldLatlng.lng+"&username=iamvdo";
-    console.log(text_url);
+    //console.log(text_url);
     var p = '<p id="char_left">You have 144 characters left</p>';
     var name;
     var population;
@@ -273,10 +273,11 @@ function form_validation(event) {
         complete: function (data) {
             if (data.readyState === 4 && data.status === 200) {
                 var reponse = data.responseJSON;
-                var response_name = reponse.geonames[0].name;
-                countryName = reponse.geonames[0].countryName;
-                //console.log(reponse.geonames[0]);
-                name = response_name;
+                console.log(reponse.geonames.length);
+                if(reponse.geonames.length != 0) {
+                    name = reponse.geonames[0].name;
+                    countryName = reponse.geonames[0].countryName;
+                }
                 //console.log(name);
 
                 // if name === null alors on affiche pas le nom du lieu évidemment
@@ -286,7 +287,6 @@ function form_validation(event) {
                 } else {
                     $('#textarea_toname').val("Coordonnées :\nLat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng);
                 }
-            
 
             
                 // Mise à jour du textArea
@@ -362,7 +362,7 @@ function text_area_MAJ_function() {
 function create_image(img_src) {
     
     var img = '<img id="img_toname" src='+img_src+'>'; // ça ça marche 
-    console.log("img_src = " + img_src);
+    //console.log("img_src = " + img_src);
 
     return img
 }
