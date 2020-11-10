@@ -53,7 +53,7 @@
             </div> -->
 
             <!-- div pour afficher les coordonnées de l'ISS -->
-            <div id="coordinates">Coordonnées<br></div>
+            <div id="coordinates">Coordinates<br></div>
 
             <!-- Checkbox. Si true la carte suit l'ISS -->
             <div id='checkbox'>

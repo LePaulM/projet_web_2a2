@@ -153,6 +153,7 @@ button {
     grid-column: 1/4;
     text-align: center;
     justify-self: center;
+    justify-content: start;
 
     margin: 0px; 
     width: 450px; 

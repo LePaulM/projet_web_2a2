@@ -36,7 +36,25 @@ function init() {
     var Long;
     var oldLatlng;
 
-    console.log(Lat);
+    // récupération de la position de l'ISS au chargement de la page
+    $.ajax({
+        type: 'GET',
+        dataType: 'jsonp',
+        url: 'http://api.open-notify.org/iss-now.json',
+        async: false,
+        crossDomain: true,
+        complete: function (data) {
+            if (data.readyState === 4 && data.status === 200) {
+                Lat = parseFloat(data.responseJSON.iss_position.latitude);
+                Long = parseFloat(data.responseJSON.iss_position.longitude);
+                var latlng = L.latLng(Lat,Long);
+                //console.log("Lat : "+Lat+", Long : "+Long);
+                gui(latlng,oldLatlng);
+            }
+        }
+    });
+
+    //console.log(Lat);
     // adapte la taille de la carte à la taille de l'écran
     var height = window.innerHeight;
     var width = window.innerWidth;
@@ -63,7 +81,9 @@ function init() {
             //console.log(oldLatlng);      
         }
     
-    
+    // •Empêchez le comportement par défaut (envoi des données au serveur)
+    // j'aurais pu mettre le if (photo == false) ici mais je préfère garder le mouvement de l'ISS visible
+        // récupération de la position de l'ISS
         $.ajax({
             type: 'GET',
             dataType: 'jsonp',
@@ -76,6 +96,8 @@ function init() {
                     Long = parseFloat(data.responseJSON.iss_position.longitude);
                     var latlng = L.latLng(Lat,Long);
                     //console.log("Lat : "+Lat+", Long : "+Long);
+                    // on éxécute la fontcion gui quand on a récupéré la position latlng
+                    // oldlatlng servira à tracer la ligne 
                     gui(latlng,oldLatlng);
                 }
             }
@@ -88,7 +110,7 @@ function init() {
 
 
 // Map Management
-// create and initiate map
+// create and initiate map mapbox://styles/lepollux/ckhchpfbj0b8u1aps50vdx668
 
 function init_map() {
     map = L.map('map').setView([43, 4], current_zoom);
@@ -136,15 +158,28 @@ function gui(latlng,oldLatlng) {
     if (layerGroup.hasLayer(marker) === true) {
         layerGroup.removeLayer(marker);
     }
+
+    // Ajoutez un marker à la position récupérée (créez une icône personnalisée de votre choix)
+    var satellite_icon = L.icon({
+        iconUrl: 'assets/images/satellite.png',
     
-    addmarker(latlng)
+        iconSize:     [75, 60], // size of the icon
+        iconAnchor:   [37.5, 30], // point of the icon which will correspond to marker's location
+        popupAnchor:  [0, -30] // point from which the popup should open relative to the iconAnchor
+    });
+    marker = L.marker(latlng, {icon: satellite_icon});
+    layerGroup.addLayer(marker);
+    var popup = L.popup()
+        .setContent('ISS Position<br>Latitude : ' + latlng.lat + ', Longitude : ' + latlng.lng)
+    marker.bindPopup(popup);
 
     // Une ligne entre le point précédent et le nouveau point doit se créer afin de voir le déplacement de l’ISS
-    if (latlng.lat != null) {
-        drawline(latlng,oldLatlng);
+    if (oldLatlng != null) {
+        var latlngsArray = [];
+        latlngsArray.push(oldLatlng);
+        latlngsArray.push(latlng);
+        var polyline = L.polyline(latlngsArray, {color: '#FFE000'}).addTo(map);
     }
-
-
 
     if (photo == false) {
         //console.log(latlng);
@@ -162,26 +197,6 @@ function gui(latlng,oldLatlng) {
         
     }
 
-}
-
-// Une ligne entre le point précédent et le nouveau point doit se créer afin de voir le déplacement de l’ISS
-function drawline(latlng,oldLatlng) {
-    var latlngsArray = [];
-    
-    if (oldLatlng != null) {
-        latlngsArray.push(oldLatlng);
-        latlngsArray.push(latlng);
-        var polyline = L.polyline(latlngsArray, {color: '#FFE000'}).addTo(map);
-    }
-}
-
-// Ajoutez un marker à la position récupérée (créez une icône personnalisée de votre choix)
-function addmarker(latlng) {
-    marker = L.marker(latlng);
-    layerGroup.addLayer(marker);
-    var popup = L.popup()
-        .setContent('ISS Position<br>Latitude : ' + latlng.lat + ', Longitude : ' + latlng.lng)
-    marker.bindPopup(popup);
 }
 
 // Ajoutez également quelque part la la.tude/longitude en mode texte
@@ -224,6 +239,8 @@ Utilisez cette URL comme src d’une image HTML ou en image d’arrière-plan CS
 
 Cette API a toutefois besoin d’une clé, il faut donc s’inscrire (gratuit) sur le site. 
 Ou utilisez celle de Vincent pk.eyJ1IjoiaWFtdmRvIiwiYSI6IkI1NGhfYXMifQ.2FD2Px_Fh2gAZCFTxdrL7g
+
+prends une phot à la position de l'ISS au moment du clic, pas à l'endroit du marker au moment du clic
 */
 function form_validation(event) {
     // •Empêchez le comportement par défaut (envoi des données au serveur)
@@ -248,7 +265,7 @@ function form_validation(event) {
                 Lat = parseFloat(data.responseJSON.iss_position.latitude);
                 Long = parseFloat(data.responseJSON.iss_position.longitude);
 
-                console.log("Lat : "+Lat+", Long : "+Long);
+                // console.log("Lat : "+Lat+", Long : "+Long);
                 var latlng = L.latLng(Lat,Long);
 
 
@@ -279,24 +296,31 @@ function form_validation(event) {
                                 name = reponse.geonames[0].name;
                                 countryName = reponse.geonames[0].countryName;
                             }
-                            console.log(name);
+                            console.log("city nearby name : "+name);
 
                             // ajoute un marker à l'endroit où l'ISS est pendant la photo
-                            var marker = L.marker([Lat, Long])
+                            var satellite_icon = L.icon({
+                                iconUrl: 'assets/images/camera.png',
+                            
+                                iconSize:     [64, 64], // size of the icon
+                                iconAnchor:   [32, 32], // point of the icon which will correspond to marker's location
+                                popupAnchor:  [0, -16] // point from which the popup should open relative to the iconAnchor
+                            });
+                            var marker = L.marker([Lat, Long], {icon: satellite_icon});
                             marker.addTo(map);
 
                             // if name === null alors on affiche pas le nom du lieu évidemment
                             if (name !==null && typeof(name) !== 'undefined') {
-                                $('#textarea_toname').val("Bonjour "+name+", "+countryName+" !\nISS Coordonnées :\nLat : " + latlng.lat + ", Long : " + latlng.lng);
+                                $('#textarea_toname').val("Hello "+name+", "+countryName+" !\nISS Coordinates :\nLat : " + latlng.lat + ", Long : " + latlng.lng);
                                 
                                 var popup = L.popup()
-                                .setContent("Bonjour "+name+", "+countryName+" !<br>ISS Coordonnées :<br>Lat : " + latlng.lat + ", Long : " + latlng.lng /* +'<br><button>Bouton</button>' */);
+                                .setContent("Hello "+name+", "+countryName+" !<br>ISS Coordinates :<br>Lat : " + latlng.lat + ", Long : " + latlng.lng /* +'<br><button>Bouton</button>' */);
                                 marker.bindPopup(popup);
                             } else {
-                                $('#textarea_toname').val("ISS Coordonnées :\nLat : " + latlng.lat + ", Long : " + latlng.lng);
+                                $('#textarea_toname').val("ISS Coordinates :\nLat : " + latlng.lat + ", Long : " + latlng.lng);
                                 
                                 var popup = L.popup()
-                                .setContent("ISS Coordonnées :<br>Lat : " + latlng.lat + ", Long : " + latlng.lng /* +'<br><button>Bouton</button>' */);
+                                .setContent("ISS Coordinates :<br>Lat : " + latlng.lat + ", Long : " + latlng.lng /* +'<br><button>Bouton</button>' */);
                                 marker.bindPopup(popup);
                             }
                             
@@ -320,16 +344,22 @@ function form_validation(event) {
                     -zoom souhaité par l’utilisateur!
                     -une orientation aléatoire (entre 0 et 360°) ce qui dans notre cas peut rajouter un coté véridique à notre prise de vue
                     Utilisez cette URL comme src d’une image HTML ou en image d’arrière-plan CSS  
+                    https://docs.mapbox.com/playground/static/
                 */
                 var img_size = "450x300";
-                var mapbox_image_basemap = "satellite-v9"
-            /*     console.log("mapbox_image_basemap : "+ mapbox_image_basemap);
+                var mapbox_image_basemap = "satellite-v9"; /* "styles/lepollux/ckhchpfbj0b8u1aps50vdx668" */
+                var bearing = Math.random() * 360;
+                var mapbox_key = "pk.eyJ1Ijoic21lcm1ldCIsImEiOiJjaXRwamcwc3UwMDBiMm5xb21yMWdra25yIn0.vF2GPPTa0bDqjJmJZpIl7g"; //celle de vincent
+                var img_src = "https://api.mapbox.com/styles/v1/mapbox/"+mapbox_image_basemap+"/static/"+ latlng.lng +","+ latlng.lat +","+current_zoom+","+bearing+"/"+img_size+"?access_token="+mapbox_key;
+                var img = '<img id="img_toname" src='+img_src+'>'
+                /*     
+                console.log("mapbox_image_basemap : "+ mapbox_image_basemap);
                 console.log("oldLat : "+ oldLatlng.lat +", oldLng : "+ oldLatlng.lng);
                 console.log("current_zoom : "+current_zoom);
-                console.log("img_size : " + img_size); */
-                var mapbox_key = "pk.eyJ1Ijoic21lcm1ldCIsImEiOiJjaXRwamcwc3UwMDBiMm5xb21yMWdra25yIn0.vF2GPPTa0bDqjJmJZpIl7g"; //celle de vincent
-                var img_src = "https://api.mapbox.com/styles/v1/mapbox/"+mapbox_image_basemap+"/static/"+ latlng.lng +","+ latlng.lat +","+current_zoom+"/"+img_size+"?access_token="+mapbox_key;
-                var img = '<img id="img_toname" src='+img_src+'>'
+                console.log("img_size : " + img_size); 
+                console.log("bearing : "+bearing);
+                */
+                
                 inf_speech_dialog.append(img);
 
                 var option1= $('<button id="close_button" onclick="photo_false()">Fermer</button>');
@@ -344,8 +374,6 @@ function form_validation(event) {
         }
     });
     
-    
-
     // on desactive les boutons pour valider le formulaire et le verouillage de la vue
     $('#validate_button').prop("disabled", true);
     $('#checkbox_input').attr("checked", false);
