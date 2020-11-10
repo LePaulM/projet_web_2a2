@@ -138,15 +138,9 @@ function getValue() {
 
 //http://www.geonames.org/export/web-services.html#findNearbyPlaceName
 // Get and returns value of current iss location
-function get_text(url) {
+function get_text(url,name) {
     console.log(Lat);
-
-    var reponse;
-    var name;
-    var population;
-    var countryName;
-
-
+    
     $.ajax({
         type: 'GET',
         dataType: 'jsonp',
@@ -156,17 +150,15 @@ function get_text(url) {
         complete: function (data) {
             if (data.readyState === 4 && data.status === 200) {
                 reponse = data.responseJSON;
-                name = data.responseJSON.name;
-                population = parseInt(data.responseJSON.population);
+                name = String(data.responseJSON.geonames.name);
                 countryName = String(data.responseJSON.countryName);
-
-                console.log();
+                console.log(data.responseJSON);
+                return name
             }
         }
     });
-    console.log(reponse);
-    console.log(name,population,countryName);
-    return name,population,countryName
+    
+    
 }
 
 
@@ -275,16 +267,17 @@ function form_validation(event) {
 
     var text_url = "http://api.geonames.org/findNearbyPlaceNameJSON?lat="+oldLatlng.lat+"&lng="+oldLatlng.lng+"&username=iamvdo";
     console.log(text_url);
-    var p = '<p>You have 144 characters left</p>';
+    var p = '<p id="char_left">You have 144 characters left</p>';
     var paragraph = generate_text(text_url);
     inf_speech_dialog.append(p);
     inf_speech_dialog.append(paragraph);
 
+    // Mise à jour du textArea
     text_area_MAJ_function();
 
     $('#textarea_toname').keyup(function(){
         text_area_MAJ_function()
-      });
+    });
 
     /* •Création de la photo: pour cela, nous allons utiliser un service de carte statique, par exemple celui de Mapbox: voir cette URL pour en comprendre le fonctionnement: https://docs.mapbox.com/playground/static/
         Générez donc la bonne URL 
@@ -352,13 +345,22 @@ function create_image(img_src) {
 // •Création du texte: pour cela, nous allons encore une fois utiliser un service, celui de geonames nommé findNearbyPlaceNameJSON, ici: http://www.geonames.org/export/web-services.html#findNearbyPlaceName 
 
 function generate_text(url) {
+
+    var name;
+    var population;
+    var countryName;
+    var paragraph;
     //var paragraph = "<p id='p_toname'>Coordonnées :<br>Lat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng +"</br></p>";
     //$("#info_speech").append(paragraph);
-    var name,population,countryName = get_text(url);
+    name = get_text(url, name);
     console.log("name : " + name);
-
-    var paragraph = "<textarea name='infos' id='textarea_toname'>Bonjour "+name+", "+countryName+" et ses "+population+" habitants !\nCoordonnées :\nLat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng +"</textarea>";
-    
+    // if name === null alors on affiche pas le nom du lieu évidemment
+    if (name !==null && typeof(name) !== 'undefined') {
+        paragraph = "<textarea name='infos' id='textarea_toname'>Bonjour "+name+", "+countryName+"!\nCoordonnées :\nLat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng +"</textarea>";
+    } else {
+        paragraph = "<textarea name='infos' id='textarea_toname'>Coordonnées :\nLat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng +"</textarea>";
+    }
+   
     return paragraph
 }
 
@@ -398,8 +400,8 @@ function addmarker(latlng) {
     marker = L.marker(latlng);
     layerGroup.addLayer(marker);
     var popup = L.popup()
-        .setContent('<p>Hello world!<br />This is a nice popup.</p>')
-    marker.bindPopup('ISS Position<br>Latitude : ' + Lat + ', Longitude : ' + Long);
+        .setContent('ISS Position<br>Latitude : ' + Lat + ', Longitude : ' + Long)
+    marker.bindPopup(popup);
 }
 
 // Ajoutez également quelque part la la.tude/longitude en mode texte
