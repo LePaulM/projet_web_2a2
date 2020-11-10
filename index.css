@@ -1,5 +1,5 @@
 body {
-    background-color: #06389B;
+    background-color: #1DA1F2;
     /* font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif; */
     font-family: Tahoma, Geneva, sans-serif;
 }
@@ -28,10 +28,14 @@ body {
     top: 0;
     right: 0;
     width : 350px;
-    border-radius: 10px;
-    background-color: #DEDEDE;
+    
+
+    background-color: white;
     opacity : 0.8;
+
     border :solid;
+    border-color: #1DA1F2;
+    border-radius: 5px;
 }
 #coordinates {
 /*     background-color:#9966FF; */
@@ -80,12 +84,15 @@ body {
 
 button {
     width : 200px;
-    border : solid;
+
     padding : 10px;
-    border-radius: 10px;
-    background-color:#06389B;
-    border-color: #1A1D22;
-    color : wheat;
+    margin: 10px;
+    border : solid;
+    border-radius: 50em;
+    border-color: #1DA1F2;
+
+    background-color:#1DA1F2;
+    color : white;
 }
 
 #info_speech {
@@ -96,18 +103,19 @@ button {
     margin: 10px;
     border-radius: 10px;
 
-    background-color: #DEDEDE;
+    background-color: white;
+    opacity : 1;
+
     border :solid;
-    opacity : 0.8;
-    
+    border-radius: 5px;
+    /* border-width: 1px; */
+    border-color: #1DA1F2;
     /* margin-right: 370px; */
 
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: minmax(100px, auto);
+    grid-auto-rows: minmax(50px, auto);
     align-items: center;
-
-
 }
 
 #speech_title {
@@ -130,46 +138,64 @@ button {
 }
 
 
-#p_toname {
-    grid-row: 1;
+#textarea_toname {
+    grid-row: 3;
     grid-column: 1/4;
     text-align: center;
+    justify-self: center;
+
+    margin: 0px; 
+    width: 450px; 
+    height: 53px;
+
+    border : solid;
+    border-radius: 3px;
+    border-color: #AAB8C2;
+    border-width: 1px;
+
+    font-family: inherit;
 }
 
 #img_toname {
-    grid-row: 2;
+    grid-row: 1;
     grid-column: 1/4;
-    align-self: center;
+    justify-self: center;
+    margin-top: 10px; 
 }
 
-#close {
-    grid-row: 3;
+#close_button {
+    grid-row: 4;
     grid-column: 1/2;
 
-    margin: 10px;
     width : 200px;
     padding : 10px;
     border : solid;
-    border-radius: 10px;
+    border-radius: 50em;
 
-    background-color:#06389B;
-    border-color: #1A1D22;
-    color : wheat;
+    background-color:#1DA1F2;
+    border-color: #1DA1F2;
+    color : white;
 }
 
-#tweet {
-    grid-row: 3;
+#tweet_button {
+    grid-row: 4;
     grid-column: 3/4;
 
-    margin: 10px;
     width : 200px;
     padding : 10px;
     border : solid;
-    border-radius: 10px;
+    border-radius: 50em;
 
-    background-color:#06389B;
-    border-color: #1A1D22;
-    color : wheat;
+    background-color:#1DA1F2;
+    border-color: #1DA1F2;
+    color : white;
+}
+
+p {
+    grid-row: 2;
+    grid-column: 1/4;
+    text-align: center;
+    justify-self: center;
 }
 
 option{
