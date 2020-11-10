@@ -73,6 +73,10 @@ function init() {
             showLatLng();
         }
     }
+        // La position du marker doit être mise à jour, le texte latitude/longitude également
+    window.setInterval("gui()","3000");  
+
+    //window.setInterval("gui()","10000");  
     
 }
 
@@ -85,7 +89,7 @@ window.onload = init();
 var map;
 
 function init_map() {
-     map = L.map('map').setView([43, 4], current_zoom);
+    map = L.map('map').setView([43, 4], current_zoom);
 
     // La clef d'api mapbox sert à accéder à l'affichage de la carte, ainsi qu'aux calculs d'itinéraires
     var mapboxToken = 'pk.eyJ1Ijoic21lcm1ldCIsImEiOiJjaXRwamcwc3UwMDBiMm5xb21yMWdra25yIn0.vF2GPPTa0bDqjJmJZpIl7g'
@@ -95,12 +99,12 @@ function init_map() {
         minZoom: 2,
         id: 'mapbox/satellite-v9',
         maxZoom: 13,
-         zoom: 10,
+        zoom: 10,
         accessToken: mapboxToken
     });
     
     mapbox_tilelayer.addTo(map);
- 
+
     layerGroup.addTo(map);
 }
 
@@ -112,7 +116,7 @@ function getValue() {
         var oldLat = Lat;
         var oldLng = Long;
         oldLatlng = L.latLng(oldLat,oldLng);
-         //console.log(oldLatlng);      
+        //console.log(oldLatlng);      
     }
 
 
@@ -139,25 +143,12 @@ function getValue() {
 //http://www.geonames.org/export/web-services.html#findNearbyPlaceName
 // Get and returns value of current iss location
 function get_text(url,name) {
-    console.log(Lat);
+    //console.log(Lat);
+    var response_name
+
     
-    $.ajax({
-        type: 'GET',
-        dataType: 'jsonp',
-        url: url,
-        async: false,
-        crossDomain: true,
-        complete: function (data) {
-            if (data.readyState === 4 && data.status === 200) {
-                reponse = data.responseJSON;
-                name = String(data.responseJSON.geonames.name);
-                countryName = String(data.responseJSON.countryName);
-                console.log(data.responseJSON);
-                return name
-            }
-        }
-    });
-    
+    console.log(name);
+    return name
     
 }
 
@@ -208,10 +199,7 @@ function gui() {
     
 }
 
-// La position du marker doit être mise à jour, le texte latitude/longitude également
-window.setInterval("gui()","3000");  
 
-//window.setInterval("gui()","10000");  
 
 
 /* Ajoutez également un contrôle permettant de me@re à jour la position de la carte automa.quement. 
@@ -268,16 +256,50 @@ function form_validation(event) {
     var text_url = "http://api.geonames.org/findNearbyPlaceNameJSON?lat="+oldLatlng.lat+"&lng="+oldLatlng.lng+"&username=iamvdo";
     console.log(text_url);
     var p = '<p id="char_left">You have 144 characters left</p>';
-    var paragraph = generate_text(text_url);
+    var name;
+    var population;
+    var countryName;
+    var paragraph = "<textarea name='infos' id='textarea_toname'></textarea>";
     inf_speech_dialog.append(p);
     inf_speech_dialog.append(paragraph);
+    //var paragraph = "<p id='p_toname'>Coordonnées :<br>Lat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng +"</br></p>";
+    //$("#info_speech").append(paragraph);
+    $.ajax({
+        type: 'GET',
+        dataType: 'jsonp',
+        url: text_url,
+        async: false,
+        crossDomain: true,
+        complete: function (data) {
+            if (data.readyState === 4 && data.status === 200) {
+                var reponse = data.responseJSON;
+                var response_name = reponse.geonames[0].name;
+                countryName = reponse.geonames[0].countryName;
+                //console.log(reponse.geonames[0]);
+                name = response_name;
+                //console.log(name);
 
-    // Mise à jour du textArea
-    text_area_MAJ_function();
+                // if name === null alors on affiche pas le nom du lieu évidemment
+                if (name !==null && typeof(name) !== 'undefined') {
+                    $('#textarea_toname').val("Bonjour "+name+", "+countryName+" !\nCoordonnées :\nLat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng);
+                    
+                } else {
+                    $('#textarea_toname').val("Coordonnées :\nLat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng);
+                }
+            
 
-    $('#textarea_toname').keyup(function(){
-        text_area_MAJ_function()
+            
+                // Mise à jour du textArea
+                text_area_MAJ_function();
+            
+                $('#textarea_toname').keyup(function(){
+                    text_area_MAJ_function()
+            })
+        }
+    }
     });
+
+
 
     /* •Création de la photo: pour cela, nous allons utiliser un service de carte statique, par exemple celui de Mapbox: voir cette URL pour en comprendre le fonctionnement: https://docs.mapbox.com/playground/static/
         Générez donc la bonne URL 
@@ -297,8 +319,10 @@ function form_validation(event) {
     var img = create_image("https://api.mapbox.com/styles/v1/mapbox/"+mapbox_image_basemap+"/static/"+ oldLatlng.lng +","+ oldLatlng.lat +","+current_zoom+"/"+img_size+"?access_token="+mapbox_key);
     inf_speech_dialog.append(img);
 
-    var options = append_options();
-    inf_speech_dialog.append(options);
+    var option1,option2 = append_options();
+    inf_speech_dialog.append(option1);
+    console.log(option1);
+    inf_speech_dialog.append(option2);
 
     inf_speech_dialog.css('opacity',1);
     inf_speech_dialog.show();
@@ -318,15 +342,16 @@ function form_validation(event) {
 
 function text_area_MAJ_function() {
     var max = 144;
-    var textChar = $('textarea').val().length;
+    //console.log($('#textarea_toname'));
+    var textChar = $('#textarea_toname').val().length;
     var charLeft = max - textChar;
     console.log(charLeft);
-    $('p').text('You have ' + charLeft + ' characters left');
+    $('#char_left').text('You have ' + charLeft + ' characters left');
     
     if (charLeft <= 0) {
-        $('input').attr('disabled', true);
+        $('#textarea_toname').attr('disabled', true);
     } else {
-        $('input').attr('disabled', false);
+        $('#textarea_toname').attr('disabled', false);
     }
 }
 
@@ -346,28 +371,15 @@ function create_image(img_src) {
 
 function generate_text(url) {
 
-    var name;
-    var population;
-    var countryName;
-    var paragraph;
-    //var paragraph = "<p id='p_toname'>Coordonnées :<br>Lat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng +"</br></p>";
-    //$("#info_speech").append(paragraph);
-    name = get_text(url, name);
-    console.log("name : " + name);
-    // if name === null alors on affiche pas le nom du lieu évidemment
-    if (name !==null && typeof(name) !== 'undefined') {
-        paragraph = "<textarea name='infos' id='textarea_toname'>Bonjour "+name+", "+countryName+"!\nCoordonnées :\nLat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng +"</textarea>";
-    } else {
-        paragraph = "<textarea name='infos' id='textarea_toname'>Coordonnées :\nLat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng +"</textarea>";
-    }
-   
-    return paragraph
+
 }
 
 function append_options() {
-    var options= $('<button id="close_button" onclick="photo_false()">Fermer</button><button id="tweet_button" onclick="photo_false()">Tweet</button>');
+    var option1= $('<button id="close_button" onclick="photo_false()">Fermer</button>');
+    var option2= $('<button id="tweet_button" onclick="photo_false()">Tweet</button>');
+    console.log(option1);
 
-    return options;
+    return option1,option2;
 }
 
 
@@ -437,33 +449,33 @@ function close_info_speech() {
         maxZoom: 19,
     });
     
-     Esri_WorldImagery.addTo(map); */
+    Esri_WorldImagery.addTo(map); */
 
 
 /*     map = L.map('map').setView([-33.87, 150.77], current_zoom);
     var layer = L.esri.basemapLayer('Imagery').addTo(map);
     var layerLabels;
-  
+
     function setBasemap (basemap) {
-      if (layer) {
+    if (layer) {
         map.removeLayer(layer);
-      }
-  
-      layer = L.esri.basemapLayer(basemap);
-  
-      map.addLayer(layer);
-  
-      if (layerLabels) {
+    }
+
+    layer = L.esri.basemapLayer(basemap);
+
+    map.addLayer(layer);
+
+    if (layerLabels) {
         map.removeLayer(layerLabels);
-      }
-  
-      if (
+    }
+
+    if (
         basemap === 'ShadedRelief' ||
         basemap === 'Oceans' ||
         basemap === 'Gray' ||
         basemap === 'DarkGray' ||
         basemap === 'Terrain'
-      ) {
+    ) {
         $('#teleobjectif_label').hide();
         if (current_zoom === 7) {
             $('#teleobjectif_radio_reflex').click();
@@ -474,16 +486,16 @@ function close_info_speech() {
 
         layerLabels = L.esri.basemapLayer(basemap + 'Labels');
         map.addLayer(layerLabels);
-      } else if (basemap.includes('Imagery')) {
+    } else if (basemap.includes('Imagery')) {
         $('#teleobjectif_label').show();
         Esri_WorldImagery.addTo(map);
-      } else {
+    } else {
         $('#teleobjectif_label').show();
-      }
+    }
     }
     document
-      .querySelector('#basemaps')
-      .addEventListener('change', function (e) {
+    .querySelector('#basemaps')
+    .addEventListener('change', function (e) {
         var basemap = e.target.value;
         setBasemap(basemap);
-      }); */
+    }); */
