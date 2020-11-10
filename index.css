@@ -2,7 +2,7 @@ body {
     background-color: #E1E8ED;
     /* font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif; */
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-    /* font-family: arial,sans-serif; */
+    /* font-family: "Gotham",sans-serif; */
     font-size: 14px;
     font-weight: 20px;
 }
@@ -37,8 +37,9 @@ body {
     opacity : 1;
 
     border :solid;
-    border-color: #1DA1F2;
-    border-radius: 5px;
+    border-color: #AAB8C2;
+    border-radius: 10px;
+    border-width: 1px;
 }
 #coordinates {
 /*     background-color:#9966FF; */
@@ -110,13 +111,14 @@ button {
     margin: 10px;
     border-radius: 10px;
 
+    box-shadow: 0 0 3px white;
     background-color: white;
     opacity : 1;
 
     border :solid;
-    border-radius: 5px;
-    /* border-width: 1px; */
-    border-color: #1DA1F2;
+    border-radius: 10px;
+    border-width: 1px;
+    border-color: #AAB8C2;
     /* margin-right: 370px; */
 
     display: grid;
@@ -136,6 +138,7 @@ button {
     grid-row: 2;
     grid-column: 1/4;
     text-align: center;
+    padding: 10px;
 }
 
 #close_info_speech_button {
@@ -168,7 +171,7 @@ button {
 #textarea_toname:focus {
     outline: none !important;
     border:2px solid #00acee;
-    /* box-shadow: 0 0 10px #719ECE; */
+    box-shadow: 0 0 10px #719ECE;
 }
 
 #img_toname {

@@ -1,92 +1,94 @@
 /**
  * IDEES
  * 
- * séparer fichiers : map.js, iss_movement (pas vraiment ça mais t'as l'idée), init.js?, etc
- * 
- * promises pour attendre le résultat de la requête avant de faire le reste
- * 
- * Laisser le premier marker
- * juste cacher les marker précédents et les afficher quand on passe la souris sur la position
- * 
  * afficher l'heure également, genre pour montrer la vitesse
  * 
  * drawline et tout se font toujours
  * juste le setview qui bouge pas
  * checkbox.setclickable(false)
+ *     
+ * ajouter un marker à l'endroit de la photo
+ * avec un bouton
+ * grace auquel tu peux tweeter à nouveau la photo
  * 
  * */
 
-var Lat;
-var Long;
-var oldLatlng;
-var latlngsArray = [];
 
+
+// passer dans variables de gui pour gérer l'affichage des marker 
+// retour de init_map()
+var map;
 var marker;
 var layerGroup = L.layerGroup();
 
+
+//passer dans variables de gui, 
+//initialisé dans init()
+var current_zoom = 10;
+
 var photo = false;
 
-var current_zoom = 10;
+window.onload = init();
 
 // Init function
 function init() {
-    getValue();
+    var Lat;
+    var Long;
+    var oldLatlng;
+
+    console.log(Lat);
     // adapte la taille de la carte à la taille de l'écran
     var height = window.innerHeight;
     var width = window.innerWidth;
     //console.log($('#content').outerHeight());
-    var map_height = height-$('#content').outerHeight()/* +$('#info_speech').outerHeight() */-16;
+    var map_height = height-$('#content').outerHeight()-16;
     $('#map').css('height', map_height);
     
-/*     var info_X = width/2-$('#info_speech').outerWidth()/2;
-    info_X = parseInt(info_X) + "px";
-    console.log("info_X = " + info_X);
-    
-    var info_Y = height/2-$('#content').outerHeight()/2;
-    info_Y = parseInt(info_Y) + "px";
-    console.log("info_Y = " +info_Y);
-    $('#info_speech').css('top',info_Y);
-    $('#info_speech').css('right',info_X); */
-    
+    //adapter la position de 'info_speech' et 'form' en fonction de l'écran (responsive)
 
+    //initialisation de la map
     init_map()
 
-    //$('info_speech').css();
 
     // Mettre le truc de rafraichissement de la fonction ici comme ça ça se lance direct
     // et lancer une première fois, ça marcherait
 
-
-    while (Lat === null) {
-        if (Lat === null) {
-            getValue();
-        } else {
-            console.log(Lat);
-            var latlng = L.latLng(Lat,Long);
-            console.log(latlng);
-            map.setView(latlng,current_zoom);
-        
-            // Ajoutez un marker à la posi.on récupérée (créez une icône personnalisée de votre choix)
-            addmarker(latlng)
-        
-            // Ajoutez également quelque part la la.tude/longitude en mode texte
-            showLatLng();
-        }
-    }
         // La position du marker doit être mise à jour, le texte latitude/longitude également
-    window.setInterval("gui()","3000");  
-
-    //window.setInterval("gui()","10000");  
+    window.setInterval(function() {
+        if (Lat !== null) {
+            //console.log(Lat);
+            var oldLat = Lat;
+            var oldLng = Long;
+            oldLatlng = L.latLng(oldLat,oldLng);
+            //console.log(oldLatlng);      
+        }
+    
+    
+        $.ajax({
+            type: 'GET',
+            dataType: 'jsonp',
+            url: 'http://api.open-notify.org/iss-now.json',
+            async: false,
+            crossDomain: true,
+            complete: function (data) {
+                if (data.readyState === 4 && data.status === 200) {
+                    Lat = parseFloat(data.responseJSON.iss_position.latitude);
+                    Long = parseFloat(data.responseJSON.iss_position.longitude);
+                    var latlng = L.latLng(Lat,Long);
+                    //console.log("Lat : "+Lat+", Long : "+Long);
+                    gui(latlng,oldLatlng);
+                }
+            }
+        });
+    // on refraichit la fonction toutes les 5 secondes
+    },"5000");   
     
 }
-
-window.onload = init();
 
 
 
 // Map Management
 // create and initiate map
-var map;
 
 function init_map() {
     map = L.map('map').setView([43, 4], current_zoom);
@@ -104,67 +106,29 @@ function init_map() {
     });
     
     mapbox_tilelayer.addTo(map);
-
+    L.control.scale().addTo(map);
     layerGroup.addTo(map);
 }
-
-// Get and returns value of current iss location
-function getValue() {
-    //console.log("Latitude : "+Lat);
-    if (Lat !== null) {
-        //console.log(Lat);
-        var oldLat = Lat;
-        var oldLng = Long;
-        oldLatlng = L.latLng(oldLat,oldLng);
-        //console.log(oldLatlng);      
-    }
-
-
-    $.ajax({
-        type: 'GET',
-        dataType: 'jsonp',
-        url: 'http://api.open-notify.org/iss-now.json',
-        async: false,
-        crossDomain: true,
-        complete: function (data) {
-            if (data.readyState === 4 && data.status === 200) {
-                Lat = parseFloat(data.responseJSON.iss_position.latitude);
-                Long = parseFloat(data.responseJSON.iss_position.longitude);
-
-                //console.log("Lat : "+Lat+", Long : "+Long);
-            }
-        }
-    });
-    
-    //console.log(typeof(Lat));
-    return Lat,Long
-}
-
-//http://www.geonames.org/export/web-services.html#findNearbyPlaceName
-// Get and returns value of current iss location
-function get_text(url,name) {
-    //console.log(Lat);
-    var response_name
-
-    
-    console.log(name);
-    return name
-    
-}
-
 
 /**
  * gui = graphical user interface
  * 
- * cette fonction change de la carte en fonction de la valeur récupérée 
+ * cette fonction change la carte en fonction de la valeur de Lat et Long 
+ * 
  */
-
-function gui() {
+/**
+ * gui = graphical user interface
+ * 
+ * cette fonction change la carte en fonction de la valeur de Lat et Long 
+ * 
+ * @param {*} Lat 
+ * @param {*} Long coordonnée longitude
+ * @param {*} oldLatlng ancienne coordonnée, sert à tracer la ligne entre ce point et le suivant
+ */
+function gui(latlng,oldLatlng) {
     // •Empêchez le comportement par défaut (envoi des données au serveur)
-
-    // regarder promises pour faire attendre la réponse au reste de la fonction
+    // j'aurais pu mettre le if (photo == false) ici mais je préfère garder le mouvement de l'ISS visible
     
-    var latlng = L.latLng(Lat,Long);
     //console.log(latlng);
 
     // Ajoutez un marker à la position récupérée (créez une icône personnalisée de votre choix)
@@ -176,14 +140,17 @@ function gui() {
     addmarker(latlng)
 
     // Une ligne entre le point précédent et le nouveau point doit se créer afin de voir le déplacement de l’ISS
-    drawline(latlng);
+    if (latlng.lat != null) {
+        drawline(latlng,oldLatlng);
+    }
+
 
 
     if (photo == false) {
-        //console.log(oldLatlng);
+        //console.log(latlng);
 
         // Ajoutez également quelque part la latitude/longitude en mode texte
-        showLatLng();
+        showLatLng(latlng);
 
         /* Ajoutez également un contrôle permettant de mettre à jour la position de la carte automatiquement. 
         Par exemple: case cochée, la carte suit la positon de l’ISS; case non cochée, le déplacement est libre */
@@ -195,12 +162,33 @@ function gui() {
         
     }
 
-    getValue();
-    
 }
 
+// Une ligne entre le point précédent et le nouveau point doit se créer afin de voir le déplacement de l’ISS
+function drawline(latlng,oldLatlng) {
+    var latlngsArray = [];
+    
+    if (oldLatlng != null) {
+        latlngsArray.push(oldLatlng);
+        latlngsArray.push(latlng);
+        var polyline = L.polyline(latlngsArray, {color: '#FFE000'}).addTo(map);
+    }
+}
 
+// Ajoutez un marker à la position récupérée (créez une icône personnalisée de votre choix)
+function addmarker(latlng) {
+    marker = L.marker(latlng);
+    layerGroup.addLayer(marker);
+    var popup = L.popup()
+        .setContent('ISS Position<br>Latitude : ' + latlng.lat + ', Longitude : ' + latlng.lng)
+    marker.bindPopup(popup);
+}
 
+// Ajoutez également quelque part la la.tude/longitude en mode texte
+function showLatLng(latlng) {
+    var paragraph = document.getElementById("coordinates");
+    paragraph.innerHTML = "<p>Coordonnées :<br>Lat : " + latlng.lat + ", Long : " + latlng.lng+"</p>";
+}
 
 /* Ajoutez également un contrôle permettant de me@re à jour la position de la carte automa.quement. 
 Par exemple: case cochée, la carte suit la position de l’ISS case non cochée, le déplacement est libre */
@@ -212,16 +200,12 @@ function checkbox_click() {
     console.log("checkbox.value = "+checkbox);
 }
 
-
-
-
 /** Ensuite, créez un formulaire contenant:
  * •3 boutons radio correspondants à des niveaux de zoom différents
  * Par exemple: «smartphone», «réflex» et «téléobjectif», respectivement niveau de zoom 7, 10 et 13
 */
 function change_zoom(new_level) {
-    var latlng = L.latLng(Lat,Long);
-    map.setView(latlng,new_level);
+    map.setZoom(new_level);
     current_zoom = new_level;
 }
 /*
@@ -242,96 +226,125 @@ Cette API a toutefois besoin d’une clé, il faut donc s’inscrire (gratuit) s
 Ou utilisez celle de Vincent pk.eyJ1IjoiaWFtdmRvIiwiYSI6IkI1NGhfYXMifQ.2FD2Px_Fh2gAZCFTxdrL7g
 */
 function form_validation(event) {
-
-    var inf_speech_dialog = $('#info_speech')
-    
     // •Empêchez le comportement par défaut (envoi des données au serveur)
     event.preventDefault();
     photo = true;
     //console.log("photo = " + photo);
 
-    
+    var inf_speech_dialog = $('#info_speech')
+    var Lat;
+    var Long;
+
     inf_speech_dialog.empty();
 
-    var text_url = "http://api.geonames.org/findNearbyPlaceNameJSON?lat="+oldLatlng.lat+"&lng="+oldLatlng.lng+"&username=iamvdo";
-    //console.log(text_url);
-    var p = '<p id="char_left">You have 144 characters left</p>';
-    var name;
-    var population;
-    var countryName;
-    var paragraph = "<textarea name='infos' id='textarea_toname'></textarea>";
-    inf_speech_dialog.append(p);
-    inf_speech_dialog.append(paragraph);
-    //var paragraph = "<p id='p_toname'>Coordonnées :<br>Lat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng +"</br></p>";
-    //$("#info_speech").append(paragraph);
     $.ajax({
         type: 'GET',
         dataType: 'jsonp',
-        url: text_url,
+        url: 'http://api.open-notify.org/iss-now.json',
         async: false,
         crossDomain: true,
         complete: function (data) {
             if (data.readyState === 4 && data.status === 200) {
-                var reponse = data.responseJSON;
-                console.log(reponse.geonames.length);
-                if(reponse.geonames.length != 0) {
-                    name = reponse.geonames[0].name;
-                    countryName = reponse.geonames[0].countryName;
-                }
-                //console.log(name);
+                Lat = parseFloat(data.responseJSON.iss_position.latitude);
+                Long = parseFloat(data.responseJSON.iss_position.longitude);
 
-                // if name === null alors on affiche pas le nom du lieu évidemment
-                if (name !==null && typeof(name) !== 'undefined') {
-                    $('#textarea_toname').val("Bonjour "+name+", "+countryName+" !\nCoordonnées :\nLat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng);
-                    
-                } else {
-                    $('#textarea_toname').val("Coordonnées :\nLat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng);
-                }
+                console.log("Lat : "+Lat+", Long : "+Long);
+                var latlng = L.latLng(Lat,Long);
 
-            
-                // Mise à jour du textArea
-                text_area_MAJ_function();
-            
-                $('#textarea_toname').keyup(function(){
-                    text_area_MAJ_function()
-            })
+
+
+                // •Création du texte: pour cela, nous allons encore une fois utiliser un service, celui de geonames nommé findNearbyPlaceNameJSON, ici: http://www.geonames.org/export/web-services.html#findNearbyPlaceName 
+                var text_url = "http://api.geonames.org/findNearbyPlaceNameJSON?lat="+latlng.lat+"&lng="+latlng.lng+"&username=iamvdo";
+                //console.log(text_url);
+                var p = '<p id="char_left">You have 144 characters left</p>';
+                var name;
+                var population;
+                var countryName;
+                var paragraph = "<textarea name='infos' id='textarea_toname'></textarea>";
+                inf_speech_dialog.append(p);
+                inf_speech_dialog.append(paragraph);
+                //var paragraph = "<p id='p_toname'>Coordonnées :<br>Lat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng +"</br></p>";
+                //$("#info_speech").append(paragraph);
+                $.ajax({
+                    type: 'GET',
+                    dataType: 'jsonp',
+                    url: text_url,
+                    async: false,
+                    crossDomain: true,
+                    complete: function (data) {
+                        if (data.readyState === 4 && data.status === 200) {
+                            var reponse = data.responseJSON;
+                            //console.log(reponse.geonames.length);
+                            if(reponse.geonames.length != 0) {
+                                name = reponse.geonames[0].name;
+                                countryName = reponse.geonames[0].countryName;
+                            }
+                            console.log(name);
+
+                            // ajoute un marker à l'endroit où l'ISS est pendant la photo
+                            var marker = L.marker([Lat, Long])
+                            marker.addTo(map);
+
+                            // if name === null alors on affiche pas le nom du lieu évidemment
+                            if (name !==null && typeof(name) !== 'undefined') {
+                                $('#textarea_toname').val("Bonjour "+name+", "+countryName+" !\nISS Coordonnées :\nLat : " + latlng.lat + ", Long : " + latlng.lng);
+                                
+                                var popup = L.popup()
+                                .setContent("Bonjour "+name+", "+countryName+" !<br>ISS Coordonnées :<br>Lat : " + latlng.lat + ", Long : " + latlng.lng /* +'<br><button>Bouton</button>' */);
+                                marker.bindPopup(popup);
+                            } else {
+                                $('#textarea_toname').val("ISS Coordonnées :\nLat : " + latlng.lat + ", Long : " + latlng.lng);
+                                
+                                var popup = L.popup()
+                                .setContent("ISS Coordonnées :<br>Lat : " + latlng.lat + ", Long : " + latlng.lng /* +'<br><button>Bouton</button>' */);
+                                marker.bindPopup(popup);
+                            }
+                            
+                        
+                            // Mise à jour du textArea
+                            text_area_MAJ_function();
+                        
+                            $('#textarea_toname').keyup(function(){
+                                text_area_MAJ_function()
+                            })
+                        }
+                    }
+                });
+
+
+
+                /* •Création de la photo: pour cela, nous allons utiliser un service de carte statique, par exemple celui de Mapbox: voir cette URL pour en comprendre le fonctionnement: https://docs.mapbox.com/playground/static/
+                    Générez donc la bonne URL 
+                    -latitude, 
+                    -longitude de l’ISS
+                    -zoom souhaité par l’utilisateur!
+                    -une orientation aléatoire (entre 0 et 360°) ce qui dans notre cas peut rajouter un coté véridique à notre prise de vue
+                    Utilisez cette URL comme src d’une image HTML ou en image d’arrière-plan CSS  
+                */
+                var img_size = "450x300";
+                var mapbox_image_basemap = "satellite-v9"
+            /*     console.log("mapbox_image_basemap : "+ mapbox_image_basemap);
+                console.log("oldLat : "+ oldLatlng.lat +", oldLng : "+ oldLatlng.lng);
+                console.log("current_zoom : "+current_zoom);
+                console.log("img_size : " + img_size); */
+                var mapbox_key = "pk.eyJ1Ijoic21lcm1ldCIsImEiOiJjaXRwamcwc3UwMDBiMm5xb21yMWdra25yIn0.vF2GPPTa0bDqjJmJZpIl7g"; //celle de vincent
+                var img_src = "https://api.mapbox.com/styles/v1/mapbox/"+mapbox_image_basemap+"/static/"+ latlng.lng +","+ latlng.lat +","+current_zoom+"/"+img_size+"?access_token="+mapbox_key;
+                var img = '<img id="img_toname" src='+img_src+'>'
+                inf_speech_dialog.append(img);
+
+                var option1= $('<button id="close_button" onclick="photo_false()">Fermer</button>');
+                var option2= $('<button id="tweet_button" onclick="photo_false()">Tweet</button>');
+                inf_speech_dialog.append(option1);
+                //console.log(option1);
+                inf_speech_dialog.append(option2);
+
+                inf_speech_dialog.css('opacity',1);
+                inf_speech_dialog.show();
+            }
         }
-    }
     });
-
-
-
-    /* •Création de la photo: pour cela, nous allons utiliser un service de carte statique, par exemple celui de Mapbox: voir cette URL pour en comprendre le fonctionnement: https://docs.mapbox.com/playground/static/
-        Générez donc la bonne URL 
-        -latitude, 
-        -longitude de l’ISS
-        -zoom souhaité par l’utilisateur!
-        -une orientation aléatoire (entre 0 et 360°) ce qui dans notre cas peut rajouter un coté véridique à notre prise de vue
-        Utilisez cette URL comme src d’une image HTML ou en image d’arrière-plan CSS  
-    */
-    var img_size = "450x300";
-    var mapbox_image_basemap = "satellite-v9"
-/*     console.log("mapbox_image_basemap : "+ mapbox_image_basemap);
-    console.log("oldLat : "+ oldLatlng.lat +", oldLng : "+ oldLatlng.lng);
-    console.log("current_zoom : "+current_zoom);
-    console.log("img_size : " + img_size); */
-    var mapbox_key = "pk.eyJ1Ijoic21lcm1ldCIsImEiOiJjaXRwamcwc3UwMDBiMm5xb21yMWdra25yIn0.vF2GPPTa0bDqjJmJZpIl7g"; //celle de vincent
-    var img = create_image("https://api.mapbox.com/styles/v1/mapbox/"+mapbox_image_basemap+"/static/"+ oldLatlng.lng +","+ oldLatlng.lat +","+current_zoom+"/"+img_size+"?access_token="+mapbox_key);
-    inf_speech_dialog.append(img);
-
-    var option1,option2 = append_options();
-    inf_speech_dialog.append(option1);
-    console.log(option1);
-    inf_speech_dialog.append(option2);
-
-    inf_speech_dialog.css('opacity',1);
-    inf_speech_dialog.show();
-
-    /**
-     * ajouter un marker à l'endroit de la photo
-     * avec un bouton
-     * grace auquel tu peux tweeter à nouveau la photo
-     */
+    
+    
 
     // on desactive les boutons pour valider le formulaire et le verouillage de la vue
     $('#validate_button').prop("disabled", true);
@@ -345,7 +358,7 @@ function text_area_MAJ_function() {
     //console.log($('#textarea_toname'));
     var textChar = $('#textarea_toname').val().length;
     var charLeft = max - textChar;
-    console.log(charLeft);
+    //console.log(charLeft);
     $('#char_left').text('You have ' + charLeft + ' characters left');
     
     if (charLeft <= 0) {
@@ -353,33 +366,6 @@ function text_area_MAJ_function() {
     } else {
         $('#textarea_toname').attr('disabled', false);
     }
-}
-
-/**
- * génère l'élément image qui sera ensuite ajouté  
- * @param {string} img_src source de l'image, c'est la photo tirée de l'url
- */
-function create_image(img_src) {
-    
-    var img = '<img id="img_toname" src='+img_src+'>'; // ça ça marche 
-    //console.log("img_src = " + img_src);
-
-    return img
-}
-
-// •Création du texte: pour cela, nous allons encore une fois utiliser un service, celui de geonames nommé findNearbyPlaceNameJSON, ici: http://www.geonames.org/export/web-services.html#findNearbyPlaceName 
-
-function generate_text(url) {
-
-
-}
-
-function append_options() {
-    var option1= $('<button id="close_button" onclick="photo_false()">Fermer</button>');
-    var option2= $('<button id="tweet_button" onclick="photo_false()">Tweet</button>');
-    console.log(option1);
-
-    return option1,option2;
 }
 
 
@@ -395,40 +381,6 @@ function photo_false() {
     $('#validate_button').prop("disabled", false);
     $('#checkbox_input').attr("checked", true);
     $('#checkbox_input').prop("disabled", false);
-}
-
-// Une ligne entre le point précédent et le nouveau point doit se créer afin de voir le déplacement de l’ISS
-function drawline(latlng) {
-    
-    if (oldLatlng != null) {
-        latlngsArray.push(oldLatlng);
-        latlngsArray.push(latlng);
-        var polyline = L.polyline(latlngsArray, {color: '#FFE000'}).addTo(map);
-    }
-}
-
-// Ajoutez un marker à la position récupérée (créez une icône personnalisée de votre choix)
-function addmarker(latlng) {
-    marker = L.marker(latlng);
-    layerGroup.addLayer(marker);
-    var popup = L.popup()
-        .setContent('ISS Position<br>Latitude : ' + Lat + ', Longitude : ' + Long)
-    marker.bindPopup(popup);
-}
-
-// Ajoutez également quelque part la la.tude/longitude en mode texte
-function showLatLng() {
-    var paragraph = document.getElementById("coordinates");
-    paragraph.innerHTML = "<p>Coordonnées :<br>Lat : " + Lat + ", Long : " + Long+"</p>";
-
-/*     $("#coordinates").empty();
-    var paragraph = "<p>Coordonnées :<br>Lat : " + Lat + ", Long : " + Long+"</p>";
-    $("#coordinates").append(paragraph); */
-
-
-    /* var paragraph = document.getElementById("coordinates");
-    var text = document.createTextNode("Lat : " + Lat + ", Lng : " + Long);
-    paragraph.appendChild(text); */
 }
 
 function close_info_speech() {

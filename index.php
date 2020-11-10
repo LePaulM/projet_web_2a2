@@ -24,7 +24,11 @@
         
         <form name='form' id='form'>
 
-            <!-- Niveau de zoom -->
+            <!-- Niveau de zoom 
+                Ensuite, créez un formulaire contenant:
+                •3 boutons radio correspondants à des niveaux de zoom différents
+                Par exemple: «smartphone», «réflex» et «téléobjectif», respectivement niveau de zoom 7, 10 et 13
+            -->
             <div id='radio'>
                 <label>Vue :</label><br>
                 <label>Smartphone<input type="radio" class='radio' name="form" value="7" onclick="change_zoom(7)" ></label>
