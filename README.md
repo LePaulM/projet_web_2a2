@@ -1,5 +1,5 @@
 # Installation et lancement
-Téléchargez le dossier et mettez le htdocs de votre *AMP
+Téléchargez le dossier et mettez le htdocs de votre *AMP.
 Lancez ensuite le 'index.php' depuis votre localhost.
 
 
