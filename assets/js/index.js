@@ -126,8 +126,15 @@ function map_init() {
         zoom: 10,
         accessToken: mapboxToken
     });
+	
+	var CartoDB_VoyagerOnlyLabels = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
+    });
     
     mapbox_tilelayer.addTo(map);
+	CartoDB_VoyagerOnlyLabels.addTo(map);
     L.control.scale().addTo(map);
     layerGroup.addTo(map);
 }
