@@ -17,7 +17,12 @@
         <div id='map'></div>
 
         <div id='info_speech'> 
-            <h1 id='speech_title'>Bienvenue sur le site "Tweet comme Thomas Pesquet !".</h1><p id='speech_p'>Veuillez patienter pendant que nous récupérons la position de la Station Spatiale Internationale.</p>
+            <h1 id='speech_title'>Bienvenue sur le site "Tweet comme Thomas Pesquet !".</h1>
+            <p id='speech_p'>Ce site vous propose de <b>suivre la station spatiale internationale</b> et de prendre des photos pour pouvoir les partager comme Thomas Pesquet en 2018.</p>
+            <ul>
+                <li>Vous pouvez choisir de rester vérouillé sur la station ou non grâce au bouton 'Verouiller vue'.</li>
+                <li>Les différents modes de vue permettent de modifier le niveau de zoom.</li>
+            </ul>
             <button id="close_info_speech_button" onclick="close_info_speech()">Fermer</button>
         </div>
         
@@ -36,22 +41,6 @@
                 <label id='teleobjectif_label'>Téléobjectif<input type="radio"  class='radio' name="form" onclick="change_zoom(13)" value="13"></label>
             </div>
 
-<!--             <div id="basemaps-wrapper" class="leaflet-bar">
-                <select id="basemaps">
-                    <option value="Imagery">Imagery</option>
-                    <option value="Streets">Streets</option>
-                    <option value="NationalGeographic">National Geographic</option>
-                    <option value="Oceans">Oceans</option>
-                    <option value="Gray">Gray</option>
-                    <option value="DarkGray">Dark Gray</option>
-                    <option value="Topographic">Topographic</option>
-                    <option value="ImageryClarity">Imagery (Clarity)</option>
-                    <option value="ImageryFirefly">Imagery (Firefly)</option>
-                    <option value="ShadedRelief">Shaded Relief</option>
-                    <option value="Physical">Physical</option>
-                </select>
-            </div> -->
-
             <!-- div pour afficher les coordonnées de l'ISS -->
             <div id="coordinates">Coordinates<br></div>
 
@@ -63,7 +52,7 @@
             <!-- valide comme Pesquet ! -->
 
             <div id='validate'>
-                <button id="validate_button" onclick="form_validation(event)">Tweet comme Pesquet !</button>
+                <button id="validate_button" onclick="form_validation(event)">Tweet</button>
                 <!-- <label for='submit'></label><input  type="submit" name="submit"  value="Tweet comme Pesquet !"> -->
             </div>
         </form>
@@ -72,11 +61,7 @@
 
         <div></div>
     </div>
-<!-- Retrieve a map at -87.0186 longitude, 32.4055 latitude, -->
-<!-- zoom 14, bearing 0. Pitch will default to 0. -->
-<!-- The map will be 500 pixels wide and 300 pixels high. -->
-<!-- <img src="https://api.mapbox.com/styles/v1/mapbox/light-v10/static/-87.0186,32.4055,14/500x400?access_token=pk.eyJ1IjoibGVwb2xsdXgiLCJhIjoiY2s5ZTR1bnVkMDF0bzNsbXczdDNhdnJ6YyJ9.GFqQztJamr3JyKGlaWt6dA" alt="Map of the Edmund Pettus Bridge in Selma, Alabama.">
-  -->   
+
     <div id="result"></div>
 
     <!-- Scripts -->

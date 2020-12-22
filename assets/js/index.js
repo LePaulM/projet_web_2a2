@@ -65,7 +65,7 @@ function init() {
     //adapter la position de 'info_speech' et 'form' en fonction de l'écran (responsive)
 
     //initialisation de la map
-    map_init()
+    map_init();
 
 
     // Mettre le truc de rafraichissement de la fonction ici comme ça ça se lance direct
@@ -111,7 +111,6 @@ function init() {
 
 // Map Management
 // create and initiate map mapbox://styles/lepollux/ckhchpfbj0b8u1aps50vdx668
-
 function map_init() {
     map = L.map('map').setView([43, 4], current_zoom);
 
@@ -427,68 +426,3 @@ function photo_false() {
 function close_info_speech() {
     $('#info_speech').hide();
 }
-
-
-
-/**
- * Dans map_init()
- * 
- */
-
-    /*
-    var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-        minZoom: 7,
-        maxZoom: 19,
-    });
-    
-    Esri_WorldImagery.addTo(map); */
-
-
-/*     map = L.map('map').setView([-33.87, 150.77], current_zoom);
-    var layer = L.esri.basemapLayer('Imagery').addTo(map);
-    var layerLabels;
-
-    function setBasemap (basemap) {
-    if (layer) {
-        map.removeLayer(layer);
-    }
-
-    layer = L.esri.basemapLayer(basemap);
-
-    map.addLayer(layer);
-
-    if (layerLabels) {
-        map.removeLayer(layerLabels);
-    }
-
-    if (
-        basemap === 'ShadedRelief' ||
-        basemap === 'Oceans' ||
-        basemap === 'Gray' ||
-        basemap === 'DarkGray' ||
-        basemap === 'Terrain'
-    ) {
-        $('#teleobjectif_label').hide();
-        if (current_zoom === 7) {
-            $('#teleobjectif_radio_reflex').click();
-            //map.setZoom(10);
-        }
-        
-        Esri_WorldImagery.removeFrom(map);
-
-        layerLabels = L.esri.basemapLayer(basemap + 'Labels');
-        map.addLayer(layerLabels);
-    } else if (basemap.includes('Imagery')) {
-        $('#teleobjectif_label').show();
-        Esri_WorldImagery.addTo(map);
-    } else {
-        $('#teleobjectif_label').show();
-    }
-    }
-    document
-    .querySelector('#basemaps')
-    .addEventListener('change', function (e) {
-        var basemap = e.target.value;
-        setBasemap(basemap);
-    }); */

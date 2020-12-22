@@ -129,20 +129,20 @@ button {
 
 #speech_title {
     grid-row: 1;
-    grid-column: 1/4;
+    grid-column: 1/5;
     text-align: center;
     margin: 10px;
 }
 
 #speech_p {
     grid-row: 2;
-    grid-column: 1/4;
+    grid-column: 1/5;
     text-align: center;
     padding: 10px;
 }
 
 #close_info_speech_button {
-    grid-row: 3;
+    grid-row: 4;
     grid-column: 2;
     margin: 10px;
 }
@@ -226,4 +226,10 @@ p {
 option{
     border: solid;
     width: 100%;
+}
+
+ul {
+    width : 100%;
+    grid-row: 3;
+    grid-column: 1/4;
 }
