@@ -116,7 +116,7 @@ function map_init() {
     map = L.map('map').setView([43, 4], current_zoom);
 
     // La clef d'api mapbox sert à accéder à l'affichage de la carte, ainsi qu'aux calculs d'itinéraires
-    var mapboxToken = 'pk.eyJ1Ijoic21lcm1ldCIsImEiOiJjaXRwamcwc3UwMDBiMm5xb21yMWdra25yIn0.vF2GPPTa0bDqjJmJZpIl7g'
+    var mapboxToken = 'pk.eyJ1IjoiaWFtdmRvIiwiYSI6IkI1NGhfYXMifQ.2FD2Px_Fh2gAZCFTxdrL7g'
     // Génération du fond de carte mapbox via leaflet
     var mapbox_tilelayer = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -356,7 +356,7 @@ function form_validation(event) {
                 var img_size = "450x300";           //en pixels
                 var mapbox_image_basemap = "satellite-v9"; /* "styles/lepollux/ckhchpfbj0b8u1aps50vdx668" */
                 var bearing = Math.random() * 360;
-                var mapbox_key = "pk.eyJ1Ijoic21lcm1ldCIsImEiOiJjaXRwamcwc3UwMDBiMm5xb21yMWdra25yIn0.vF2GPPTa0bDqjJmJZpIl7g"; //celle de vincent
+                var mapbox_key = "pk.eyJ1IjoiaWFtdmRvIiwiYSI6IkI1NGhfYXMifQ.2FD2Px_Fh2gAZCFTxdrL7g"; //celle de vincent
                 var img_src = "https://api.mapbox.com/styles/v1/mapbox/"+mapbox_image_basemap+"/static/"+ latlng.lng +","+ latlng.lat +","+current_zoom+","+bearing+"/"+img_size+"?access_token="+mapbox_key;
                 var img = '<img id="img_toname" src='+img_src+'>'
                 /*     
