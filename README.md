@@ -1,5 +1,5 @@
 # Installation et lancement
-Téléchargez le dossier et mettez le dans le dossier htdocs de votre *AMP.
+Téléchargez le dossier et mettez le htdocs de votre *AMP.
 
 Lancez ensuite le fichier 'index.html' depuis votre localhost.
 

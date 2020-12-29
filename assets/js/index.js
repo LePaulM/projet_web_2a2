@@ -28,10 +28,8 @@ var current_zoom = 10;
 
 var photo = false;
 
-window.onload = init();
-
 // Init function
-function init() {
+window.onload = function() {
     var Lat;
     var Long;
     var oldLatlng;
@@ -60,10 +58,133 @@ function init() {
     var width = window.innerWidth;
     //console.log($('#content').outerHeight());
     var map_height = height-$('#content').outerHeight()-16;
-    $('#map').css('height', map_height);
-    
-    //adapter la position de 'info_speech' et 'form' en fonction de l'écran (responsive)
 
+    $('#map').css('height', map_height);
+
+    //adapter la position de 'info_speech' et 'form' en fonction de l'écran (responsive)
+    if ($('#map').width() < 1000) {
+        console.log('Responsive Activé !');
+
+        var styleObject = $('#form').prop('style'); 
+
+        styleObject.removeProperty('top');
+
+
+
+        $('#form').css({
+            'z-index': '1', 
+            position: 'absolute', 
+            width : $('#map').width()-16,
+            margin : '5',
+
+            'background-color': 'white',
+            opacity : '0.85',
+
+            border :'solid',
+            'border-color': '#AAB8C2',
+            'border-radius': '10px',
+            'border-width': '1px',
+
+            'font-size' : '30px'
+        });
+
+
+        /*  form style base :
+
+            z-index: 1;
+            position: absolute;
+            top: 0;
+            right: 0;
+            width : 350px;
+            
+
+            background-color: white;
+            opacity : 1;
+
+            border :solid;
+            border-color: #AAB8C2;
+            border-radius: 10px;
+            border-width: 1px;
+            */
+
+        $('#info_speech').css({
+            'z-index': '1', 
+            position: 'absolute', 
+            width : $('#map').width()-16,
+            margin : '5',
+            top : height/2,
+
+            'background-color': 'white',
+            opacity : '0.85',
+
+            border :'solid',
+            'border-color': '#AAB8C2',
+            'border-radius': '10px',
+            'border-width': '1px',
+
+            'font-size' : '30px'
+        });
+        /*      info_speech style base :
+
+            z-index: 1;
+            position: absolute;
+
+            width : 500px;
+            margin: 10px;
+            border-radius: 10px;
+
+            box-shadow: 0 0 3px white;
+            background-color: white;
+            opacity : 1;
+
+            border :solid;
+            border-radius: 10px;
+            border-width: 1px;
+            border-color: #AAB8C2;
+
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-auto-rows: minmax(50px, auto);
+            align-items: center;
+        */
+
+        $('button').css({
+            width : '250px',
+            height : '65px',
+            padding : '10px',
+            margin: '10px',
+            
+            border : 'solid',
+            'border-radius': '50em',
+            'border-color': '#1DA1F2',
+
+            'background-color':'#1DA1F2',
+            color : 'white',
+
+            'font-weight': 'bold',
+            'font-size': '30px'
+        });
+        /* button style base :
+            width : 200px;
+
+            padding : 10px;
+            margin: 10px;
+            
+            border : solid;
+            border-radius: 50em;
+            border-color: #1DA1F2;
+
+            background-color:#1DA1F2;
+            color : white;
+
+            font-weight: bold;
+         */
+        
+        
+
+
+    }
+ 
     //initialisation de la map
     map_init();
 
@@ -274,8 +395,6 @@ function form_validation(event) {
                 // console.log("Lat : "+Lat+", Long : "+Long);
                 var latlng = L.latLng(Lat,Long);
 
-
-
                 // •Création du texte: pour cela, nous allons encore une fois utiliser un service, celui de geonames nommé findNearbyPlaceNameJSON, ici: http://www.geonames.org/export/web-services.html#findNearbyPlaceName 
                 var text_url = "http://api.geonames.org/findNearbyPlaceNameJSON?lat="+latlng.lat+"&lng="+latlng.lng+"&username=iamvdo";
                 //console.log(text_url);
@@ -283,11 +402,10 @@ function form_validation(event) {
                 var name;
                 var population;
                 var countryName;
-                var paragraph = "<textarea name='infos' id='textarea_toname'></textarea>";
+                var paragraph = "<textarea name='infos' id='textarea_toname' maxlength='144'></textarea>";
                 inf_speech_dialog.append(p);
                 inf_speech_dialog.append(paragraph);
-                //var paragraph = "<p id='p_toname'>Coordonnées :<br>Lat : " + oldLatlng.lat + ", Long : " + oldLatlng.lng +"</br></p>";
-                //$("#info_speech").append(paragraph);
+
                 $.ajax({
                     type: 'GET',
                     dataType: 'jsonp',
@@ -331,7 +449,7 @@ function form_validation(event) {
                             }
                             
                         
-                            // Mise à jour du textArea
+                            // Mise à jour du texte qui dit 'il vous reste X caractères'
                             text_area_MAJ_function();
                         
                             $('#textarea_toname').keydown(function(){
@@ -352,7 +470,7 @@ function form_validation(event) {
                     Utilisez cette URL comme src d’une image HTML ou en image d’arrière-plan CSS  
                     https://docs.mapbox.com/playground/static/
                 */
-                var img_size = "450x300";           //en pixels
+                var img_size = "450x450";           //en pixels
                 var mapbox_image_basemap = "satellite-v9"; /* "styles/lepollux/ckhchpfbj0b8u1aps50vdx668" */
                 var bearing = Math.random() * 360;
                 var mapbox_key = "pk.eyJ1IjoiaWFtdmRvIiwiYSI6IkI1NGhfYXMifQ.2FD2Px_Fh2gAZCFTxdrL7g"; //celle de vincent
@@ -374,6 +492,33 @@ function form_validation(event) {
                 //console.log(option1);
                 inf_speech_dialog.append(option2);
 
+                // on gère le côté responsive à la création de ces buttons
+                if ($('#map').width() < 1000) {
+                    $('#close_button').css({
+                        width : '250px',
+                        height : '65px',
+                        
+                        'font-size': '30px'
+                    });
+
+                    $('#tweet_button').css({
+                        width : '250px',
+                        height : '65px',
+                        
+                        'font-size': '30px'
+                    });
+
+                    $('#textarea_toname').css({
+   
+                        margin: '5px',
+                        width: '500px',
+                        height: '100px',
+
+                        'border-width' : '2px',
+                    });
+                }
+         
+
                 inf_speech_dialog.css('opacity',1);
                 inf_speech_dialog.show();
             }
@@ -389,9 +534,6 @@ function form_validation(event) {
 
 /**
  * fonction qui sert à mettre à jour le nombre de caractères restants pour le tweet (144 caractères max)
- * elle désactive la textarea quand il y a 144 caractères
- * 
- * il faudrait trouver un moyen pour que ça empêche juste d'écrire plus
  */
 function text_area_MAJ_function() {
     var max = 144;
@@ -401,11 +543,6 @@ function text_area_MAJ_function() {
     //console.log(charLeft);
     $('#char_left').text('You have ' + charLeft + ' characters left');
     
-    if (charLeft <= 0) {
-        $('#textarea_toname').attr('disabled', true);
-    } else {
-        $('#textarea_toname').attr('disabled', false);
-    }
 }
 
 
